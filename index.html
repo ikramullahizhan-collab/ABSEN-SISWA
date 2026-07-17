@@ -57,16 +57,14 @@
             transition: opacity 0.3s ease; 
         }
         
-        /* Desain Keterangan Status di Atas Foto */
-        #attendanceStatusBadge {
-            display: none; /* KITA SEMBUNYIKAN SECARA BAWAAN */
-            font-size: 18px;
-            font-weight: bold;
-            padding: 6px 20px;
-            border-radius: 20px;
+        /* Desain Keterangan Status di Atas Foto (Hanya Teks Berwarna) */
+        #attendanceStatusText {
+            display: none; /* Sembunyikan secara bawaan (saat absen pertama) */
+            font-size: 22px;
+            font-weight: 900; /* Extra tebal agar jelas terbaca */
             margin-bottom: 15px;
             text-transform: uppercase;
-            color: white;
+            letter-spacing: 1px;
         }
         
         #studentPhoto {
@@ -107,8 +105,8 @@
     <div id="log">---</div>
     
     <div id="profileContainer">
-        <div id="attendanceStatusBadge">-</div>
-        <br>
+        <div id="attendanceStatusText">-</div>
+        
         <img id="studentPhoto" src="" alt="Foto Siswa">
         
         <p class="info-label">Nama Siswa:</p>
@@ -128,7 +126,7 @@
     const statusDiv = document.getElementById("status");
     const logDiv = document.getElementById("log");
     const profileContainer = document.getElementById("profileContainer");
-    const attendanceStatusBadge = document.getElementById("attendanceStatusBadge");
+    const attendanceStatusText = document.getElementById("attendanceStatusText");
     const studentPhoto = document.getElementById("studentPhoto");
     const studentName = document.getElementById("studentName");
     const studentKelas = document.getElementById("studentKelas");
@@ -198,12 +196,12 @@
                         
                         profileContainer.style.display = "block";
 
-                        // 1. JIKA BARU ABSEN PERTAMA KALI
+                        // 1. JIKA BARU ABSEN PERTAMA KALI HARI INI
                         if (data.status === "success") {
-                            attendanceStatusBadge.style.display = "none"; // Sembunyikan badge keterangan
+                            attendanceStatusText.style.display = "none"; // Sembunyikan keterangan di atas foto
                             
                             statusDiv.innerText = "Status: " + data.message;
-                            statusDiv.style.color = "#16a34a";
+                            statusDiv.style.color = "#16a34a"; // Pesan sistem warna hijau
                             
                             profileContainer.style.backgroundColor = "#f0fdf4";
                             profileContainer.style.borderColor = "#bbf7d0";
@@ -211,13 +209,25 @@
                         } 
                         // 2. JIKA CEK KARTU (SUDAH ABSEN SEBELUMNYA)
                         else {
-                            attendanceStatusBadge.innerText = data.statusAbsen; // Tampilkan teks status awal (contoh: SUDAH TERLAMBAT)
-                            attendanceStatusBadge.style.display = "inline-block"; // Munculkan badge keterangan
-                            attendanceStatusBadge.style.backgroundColor = "#dc2626"; // Badge warna merah (peringatan)
+                            attendanceStatusText.innerText = data.statusAbsen; 
+                            attendanceStatusText.style.display = "block"; // Munculkan teks keterangan
+                            
+                            // Logika Pewarnaan Teks
+                            let statusCek = data.statusAbsen.toUpperCase();
+                            if (statusCek.includes("MASUK")) {
+                                attendanceStatusText.style.color = "#16a34a"; // Hijau
+                            } else if (statusCek.includes("TERLAMBAT")) {
+                                attendanceStatusText.style.color = "#dc2626"; // Merah
+                            } else if (statusCek.includes("PULANG")) {
+                                attendanceStatusText.style.color = "#2563eb"; // Biru
+                            } else {
+                                attendanceStatusText.style.color = "#d97706"; // Warna fallback (Oranye)
+                            }
                             
                             statusDiv.innerText = "Peringatan: " + data.message;
                             statusDiv.style.color = "#d97706";
                             
+                            // Ubah bingkai box agak kekuningan menandakan ini peringatan (sudah absen)
                             profileContainer.style.backgroundColor = "#fffbeb"; 
                             profileContainer.style.borderColor = "#fef3c7";
                             studentPhoto.style.borderColor = "#d97706";
@@ -228,9 +238,9 @@
                         statusDiv.innerText = "Status: " + data.message;
                         statusDiv.style.color = "#dc2626"; 
                         
-                        attendanceStatusBadge.innerText = "DITOLAK";
-                        attendanceStatusBadge.style.display = "inline-block"; // Munculkan badge
-                        attendanceStatusBadge.style.backgroundColor = "#7f1d1d";
+                        attendanceStatusText.innerText = "DITOLAK";
+                        attendanceStatusText.style.display = "block";
+                        attendanceStatusText.style.color = "#dc2626"; // Merah
                         
                         studentName.innerText = "KARTU TIDAK DIKENAL";
                         studentKelas.innerText = "Belum Terdaftar";
