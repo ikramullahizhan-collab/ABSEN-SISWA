@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Jam Absensi Sekolah</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            padding: 40px 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 { text-align: center; color: #1e3a8a; margin-bottom: 25px; }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+        input[type="time"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        input[type="time"]:focus {
+            border-color: #2563eb;
+            outline: none;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        .btn:hover { background-color: #1d4ed8; }
+        .btn:disabled { background-color: #9ca3af; }
+        #statusMessage {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+        .success { background-color: #dcfce7; color: #15803d; }
+        .error { background-color: #fee2e2; color: #b91c1c; }
+        .nav-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Konfigurasi Absensi</h2>
+    
+    <div class="form-group">
+        <label for="jamMasuk">Batas Jam Masuk (Tepat Waktu):</label>
+        <input type="time" id="jamMasuk" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="jamPulang">Jam Pulang Sekolah:</label>
+        <input type="time" id="jamPulang" required>
+    </div>
+    
+    <button id="btnSimpan" class="btn">Simpan Pengaturan</button>
+    
+    <div id="statusMessage"></div>
+    
+    <a href="index.html" class="nav-link">← Kembali ke Halaman Absen</a>
+</div>
+
+<script>
+    const jamMasukInput = document.getElementById("jamMasuk");
+    const jamPulangInput = document.getElementById("jamPulang");
+    const btnSimpan = document.getElementById("btnSimpan");
+    const statusMessage = document.getElementById("statusMessage");
+
+    // PASTIKAN URL WEB APP APPS SCRIPT ANDA DI SINI
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
+
+    // 1. Ambil data jam saat ini dari Google Sheets sewaktu halaman dibuka
+    async function loadCurrentConfig() {
+        btnSimpan.disabled = true;
+        showStatus("Memuat jam saat ini dari server...", "success");
+        try {
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=get_config`);
+            const data = await response.json();
+            if (data.status === "success") {
+                if (data.config.JAM_MASUK) jamMasukInput.value = data.config.JAM_MASUK;
+                if (data.config.JAM_PULANG) jamPulangInput.value = data.config.JAM_PULANG;
+                statusMessage.style.display = "none";
+            }
+        } catch (error) {
+            showStatus("Gagal memuat data saat ini dari Google Sheets.", "error");
+        } finally {
+            btnSimpan.disabled = false;
+        }
+    }
+
+    // 2. Fungsi Kirim & Simpan Jam Baru via POST
+    btnSimpan.addEventListener("click", async () => {
+        const jamMasuk = jamMasukInput.value;
+        const jamPulang = jamPulangInput.value;
+
+        if (!jamMasuk || !jamPulang) {
+            showStatus("Harap isi kedua waktu tersebut!", "error");
+            return;
+        }
+
+        btnSimpan.disabled = true;
+        showStatus("Sedang menyimpan pengaturan...", "success");
+
+        try {
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", // Mengatasi masalah CORS pada Google Apps Script Redirect
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    jam_masuk: jamMasuk,
+                    jam_pulang: jamPulang
+                })
+            });
+
+            // Karena mode 'no-cors', kita tidak bisa membaca json response langsung, 
+            // namun jika lolos ke tahap ini berarti data sukses terkirim ke server Apps Script.
+            showStatus("Pengaturan berhasil disimpan!", "success");
+            
+        } catch (error) {
+            showStatus("Terjadi kesalahan jaringan saat menyimpan.", "error");
+        } finally {
+            btnSimpan.disabled = false;
+        }
+    });
+
+    function showStatus(text, type) {
+        statusMessage.innerText = text;
+        statusMessage.className = type;
+        statusMessage.style.display = "block";
+    }
+
+    // Jalankan fungsi load data otomatis saat halaman selesai dimuat
+    window.onload = loadCurrentConfig;
+</script>
+
+</body>
+</html>
