@@ -170,7 +170,19 @@
                         
                         studentName.innerText = data.nama;
                         studentKelas.innerText = data.kelas;
-                        studentPhoto.src = data.foto ? data.foto : "https://via.placeholder.com/150x180?text=Tanpa+Foto"; 
+                        // Memastikan sistem memanggil file dari folder "foto" di GitHub Anda
+                        if (data.foto && data.foto.trim() !== "") {
+                            // URL relatif: mencari file di dalam folder 'foto'
+                            studentPhoto.src = "foto/" + data.foto;
+                        } else {
+                            // Jika kolom foto di database kosong
+                            studentPhoto.src = "https://via.placeholder.com/150x180?text=Tanpa+Foto"; 
+                        }
+                        
+                        // Tambahan: Jika file foto gagal dimuat (misal nama tidak cocok), tampilkan gambar error
+                        studentPhoto.onerror = function() {
+                            this.src = "https://via.placeholder.com/150x180?text=Foto+Tidak+Ditemukan";
+                        };
                         
                         profileContainer.style.display = "block";
                         profileContainer.style.backgroundColor = "#f0fdf4";
