@@ -25,7 +25,7 @@
             font-size: 18px;
             font-weight: bold;
             color: white;
-            background-color: #10b981; /* Hijau untuk Absen */
+            background-color: #10b981;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -46,15 +46,15 @@
             color: #6b7280;
         }
 
-        /* Styling Box Info Siswa */
         #profileContainer {
             margin-top: 25px;
-            display: none; /* Disembunyikan secara default */
+            display: none; 
             background-color: #f0fdf4;
             padding: 20px;
             border-radius: 12px;
             border: 2px solid #bbf7d0;
             animation: fadeIn 0.5s ease-in-out;
+            transition: opacity 0.3s ease; /* Tambahan transisi agar lebih halus */
         }
         #studentPhoto {
             width: 150px;
@@ -113,8 +113,8 @@
     const studentName = document.getElementById("studentName");
     const studentKelas = document.getElementById("studentKelas");
 
-    // Pastikan URL di bawah ini sama dengan URL Web App Google Apps Script Absensi Anda
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHV7S2zlt656hkX-J_g8MM-KcphUOODw5AKeJvmPed_p51Qo84ZJqlpAArn2vTvMEjKw/exec";
+    // PASTIKAN URL INI SESUAI DENGAN WEB APP ANDA
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
 
     let ndef = null;
     let isProcessing = false;
@@ -132,7 +132,7 @@
             await ndef.scan();
             
             statusDiv.innerText = "Status: Standby. Silakan Tempelkan Kartu...";
-            statusDiv.style.color = "#d97706"; // Oranye standby
+            statusDiv.style.color = "#d97706";
             scanButton.disabled = true; 
             scanButton.innerText = "Mesin Absen Aktif";
 
@@ -142,69 +142,68 @@
                 }
             });
 
-            // LOGIKA PENTING: Begitu ada kartu menempel, fungsi ini langsung jalan otomatis
             ndef.addEventListener("reading", async ({ serialNumber }) => {
-                if (isProcessing) return; // Mencegah double scan berturut-turut
+                if (isProcessing) return; 
                 isProcessing = true; 
                 
-                // Format UID kartu
                 const uid = serialNumber.replace(/:/g, "").toUpperCase();
                 logDiv.innerText = "Membaca ID Kartu: " + uid;
                 
                 statusDiv.innerText = "Status: Mencari data & mencatat absen...";
-                statusDiv.style.color = "#2563eb"; // Biru loading
+                statusDiv.style.color = "#2563eb"; 
+                
+                // Efek visual: Buat profil agak transparan saat sedang loading kartu baru
+                if (profileContainer.style.display === "block") {
+                    profileContainer.style.opacity = "0.5";
+                }
 
                 try {
-                    // Mengirim UID langsung ke Google Apps Script via GET request (?uid=...)
                     const response = await fetch(`${APPS_SCRIPT_URL}?uid=${uid}`);
                     const data = await response.json();
                     
+                    // Kembalikan transparansi penuh
+                    profileContainer.style.opacity = "1";
+                    
                     if (data.status === "success") {
                         statusDiv.innerText = "Status: " + data.message;
-                        statusDiv.style.color = "#16a34a"; // Hijau sukses
+                        statusDiv.style.color = "#16a34a"; 
                         
-                        // Tampilkan Data Profil Siswa
                         studentName.innerText = data.nama;
                         studentKelas.innerText = data.kelas;
-                        
-                        // Mengambil foto (Sesuaikan path folder/url tempat Anda menyimpan foto siswa)
-                        // Jika foto ditaruh di online storage/hosting, tambahkan domainnya di depan, misal: "https://web-sekolah.com/foto/" + data.foto
                         studentPhoto.src = data.foto ? data.foto : "https://via.placeholder.com/150x180?text=Tanpa+Foto"; 
                         
                         profileContainer.style.display = "block";
-                        
-                        // Mengubah warna background box menjadi hijau (sukses absen)
                         profileContainer.style.backgroundColor = "#f0fdf4";
                         profileContainer.style.borderColor = "#bbf7d0";
                     } else {
                         statusDiv.innerText = "Status: " + data.message;
-                        statusDiv.style.color = "#dc2626"; // Merah error
+                        statusDiv.style.color = "#dc2626"; 
                         
-                        // Tampilkan info error di box profil
                         studentName.innerText = "KARTU TIDAK DIKENAL";
                         studentKelas.innerText = "Belum Terdaftar";
                         studentPhoto.src = "https://via.placeholder.com/150x180?text=Error";
-                        profileContainer.style.display = "block";
                         
-                        // Ubah warna background box menjadi merah muda (gagal)
+                        profileContainer.style.display = "block";
                         profileContainer.style.backgroundColor = "#fef2f2";
                         profileContainer.style.borderColor = "#fecaca";
                     }
 
                 } catch (err) {
+                    profileContainer.style.opacity = "1";
                     statusDiv.innerText = "Status: Server tidak merespon.";
                     statusDiv.style.color = "#dc2626";
                     logDiv.innerText = err.message;
                 }
 
-                // JEDA COOLDOWN (3 Detik): Memberikan waktu siswa melihat namanya di layar,
-                // sebelum sistem siap menerima tap dari kartu siswa berikutnya.
+                // JEDA COOLDOWN (3 Detik)
                 setTimeout(() => {
-                    statusDiv.innerText = "Status: Standby. Silakan Tempelkan Kartu...";
+                    statusDiv.innerText = "Status: Standby. Silakan Tempelkan Kartu Berikutnya...";
                     statusDiv.style.color = "#d97706";
-                    profileContainer.style.display = "none"; // Sembunyikan profil kembali
-                    logDiv.innerText = "---";
-                    isProcessing = false; // Membuka kunci sensor kembali
+                    
+                    // BARIS DI BAWAH INI DIHAPUS agar profil siswa tidak hilang
+                    // profileContainer.style.display = "none"; 
+                    
+                    isProcessing = false; 
                 }, 3000);
             });
 
