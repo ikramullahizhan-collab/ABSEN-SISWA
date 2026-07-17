@@ -3,49 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Absensi</title>
+    <title>Sistem Absensi RFID NFC</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background-color: #10b981; /* Hijau untuk Absen */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+        
+        #status {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #log {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Styling Box Info Siswa */
+        #profileContainer {
+            margin-top: 25px;
+            display: none; /* Disembunyikan secara default */
+            background-color: #f0fdf4;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #bbf7d0;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        #studentPhoto {
+            width: 150px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 3px solid #10b981;
+            margin-bottom: 15px;
+            background-color: #e5e7eb;
+        }
+        .info-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 4px 0 0 0;
+        }
+        .info-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #111827;
+            margin: 0 0 10px 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
-    <h1>Absen Siswa</h1>
-    <input type="text" id="inputCode" placeholder="Tap Kartu atau Scan QR" autofocus>
-    <button onclick="kirimData()">Absen</button>
 
-    <div id="hasil"></div>
+<div class="container">
+    <h2>E-Absensi Siswa (NFC)</h2>
+    <p style="color: #4b5563; margin-bottom: 25px;">Aktifkan alat pemindai bawah ini, lalu siswa cukup menempelkan kartu untuk melakukan absensi secara mandiri.</p>
+    
+    <button id="scanButton" class="btn">Aktifkan Sensor Absensi</button>
+    
+    <div id="status" style="color: #4b5563;">Status: Mesin Absen Mati</div>
+    <div id="log">---</div>
+    
+    <div id="profileContainer">
+        <img id="studentPhoto" src="" alt="Foto Siswa">
+        
+        <p class="info-label">Nama Siswa:</p>
+        <p id="studentName" class="info-value">-</p>
+        
+        <p class="info-label">Kelas:</p>
+        <p id="studentKelas" class="info-value">-</p>
+    </div>
+</div>
 
-    <script>
-        // Ganti dengan URL Web App dari Apps Script Anda
-        const urlAPI = "https://script.google.com/macros/s/AKfycbyRu8UmdQqMqziPk_3ARCbKF-QxG2Iz-796tDunwmwtiAdX5bSk8uavzZTYwAVMOZluMg/exec";
+<script>
+    const scanButton = document.getElementById("scanButton");
+    const statusDiv = document.getElementById("status");
+    const logDiv = document.getElementById("log");
+    const profileContainer = document.getElementById("profileContainer");
+    const studentPhoto = document.getElementById("studentPhoto");
+    const studentName = document.getElementById("studentName");
+    const studentKelas = document.getElementById("studentKelas");
 
-        // Fitur Auto-Enter saat kartu di-tap
-        document.getElementById("inputCode").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                kirimData();
-            }
-        });
+    // Pastikan URL di bawah ini sama dengan URL Web App Google Apps Script Absensi Anda
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRu8UmdQqMqziPk_3ARCbKF-QxG2Iz-796tDunwmwtiAdX5bSk8uavzZTYwAVMOZluMg/exec";
 
-        function kirimData() {
-            let idInput = document.getElementById("inputCode").value;
-            let hasilDiv = document.getElementById("hasil");
-            hasilDiv.innerHTML = "Memproses...";
+    let ndef = null;
+    let isProcessing = false;
 
-            // Mengirim data ke Apps Script
-            fetch(urlAPI + "?id=" + idInput, { method: "POST" })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === "success") {
-                        hasilDiv.innerHTML = `<h2 style="color:green;">${data.pesan}</h2>
-                                              <p>Nama: ${data.nama}</p>
-                                              <p>Kelas: ${data.kelas}</p>`;
-                    } else {
-                        hasilDiv.innerHTML = `<h2 style="color:red;">${data.pesan}</h2>`;
-                    }
-                    // Kosongkan input untuk absen selanjutnya
-                    document.getElementById("inputCode").value = "";
-                    document.getElementById("inputCode").focus();
-                })
-                .catch(error => console.error('Error:', error));
+    scanButton.addEventListener("click", async () => {
+        if (!("NDEFReader" in window)) {
+            statusDiv.innerText = "Error: Browser HP tidak mendukung Web NFC.";
+            statusDiv.style.color = "#dc2626";
+            return;
         }
-    </script>
+
+        try {
+            statusDiv.innerText = "Status: Memulai sensor...";
+            ndef = new NDEFReader();
+            await ndef.scan();
+            
+            statusDiv.innerText = "Status: Standby. Silakan Tempelkan Kartu...";
+            statusDiv.style.color = "#d97706"; // Oranye standby
+            scanButton.disabled = true; 
+            scanButton.innerText = "Mesin Absen Aktif";
+
+            ndef.addEventListener("readingerror", () => {
+                if (!isProcessing) {
+                    logDiv.innerText = "Gagal membaca kartu. Tempelkan posisi yang pas.";
+                }
+            });
+
+            // LOGIKA PENTING: Begitu ada kartu menempel, fungsi ini langsung jalan otomatis
+            ndef.addEventListener("reading", async ({ serialNumber }) => {
+                if (isProcessing) return; // Mencegah double scan berturut-turut
+                isProcessing = true; 
+                
+                // Format UID kartu
+                const uid = serialNumber.replace(/:/g, "").toUpperCase();
+                logDiv.innerText = "Membaca ID Kartu: " + uid;
+                
+                statusDiv.innerText = "Status: Mencari data & mencatat absen...";
+                statusDiv.style.color = "#2563eb"; // Biru loading
+
+                try {
+                    // Mengirim UID langsung ke Google Apps Script via GET request (?uid=...)
+                    const response = await fetch(`${APPS_SCRIPT_URL}?uid=${uid}`);
+                    const data = await response.json();
+                    
+                    if (data.status === "success") {
+                        statusDiv.innerText = "Status: " + data.message;
+                        statusDiv.style.color = "#16a34a"; // Hijau sukses
+                        
+                        // Tampilkan Data Profil Siswa
+                        studentName.innerText = data.nama;
+                        studentKelas.innerText = data.kelas;
+                        
+                        // Mengambil foto (Sesuaikan path folder/url tempat Anda menyimpan foto siswa)
+                        // Jika foto ditaruh di online storage/hosting, tambahkan domainnya di depan, misal: "https://web-sekolah.com/foto/" + data.foto
+                        studentPhoto.src = data.foto ? data.foto : "https://via.placeholder.com/150x180?text=Tanpa+Foto"; 
+                        
+                        profileContainer.style.display = "block";
+                        
+                        // Mengubah warna background box menjadi hijau (sukses absen)
+                        profileContainer.style.backgroundColor = "#f0fdf4";
+                        profileContainer.style.borderColor = "#bbf7d0";
+                    } else {
+                        statusDiv.innerText = "Status: " + data.message;
+                        statusDiv.style.color = "#dc2626"; // Merah error
+                        
+                        // Tampilkan info error di box profil
+                        studentName.innerText = "KARTU TIDAK DIKENAL";
+                        studentKelas.innerText = "Belum Terdaftar";
+                        studentPhoto.src = "https://via.placeholder.com/150x180?text=Error";
+                        profileContainer.style.display = "block";
+                        
+                        // Ubah warna background box menjadi merah muda (gagal)
+                        profileContainer.style.backgroundColor = "#fef2f2";
+                        profileContainer.style.borderColor = "#fecaca";
+                    }
+
+                } catch (err) {
+                    statusDiv.innerText = "Status: Server tidak merespon.";
+                    statusDiv.style.color = "#dc2626";
+                    logDiv.innerText = err.message;
+                }
+
+                // JEDA COOLDOWN (3 Detik): Memberikan waktu siswa melihat namanya di layar,
+                // sebelum sistem siap menerima tap dari kartu siswa berikutnya.
+                setTimeout(() => {
+                    statusDiv.innerText = "Status: Standby. Silakan Tempelkan Kartu...";
+                    statusDiv.style.color = "#d97706";
+                    profileContainer.style.display = "none"; // Sembunyikan profil kembali
+                    logDiv.innerText = "---";
+                    isProcessing = false; // Membuka kunci sensor kembali
+                }, 3000);
+            });
+
+        } catch (error) {
+            statusDiv.innerText = "Error: Gagal mengaktifkan sensor NFC.";
+            statusDiv.style.color = "#dc2626";
+            console.error(error);
+        }
+    });
+</script>
+
 </body>
 </html>
