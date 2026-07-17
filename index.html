@@ -54,7 +54,7 @@
             border-radius: 12px;
             border: 2px solid #bbf7d0;
             animation: fadeIn 0.5s ease-in-out;
-            transition: opacity 0.3s ease; /* Tambahan transisi agar lebih halus */
+            transition: opacity 0.3s ease; 
         }
         #studentPhoto {
             width: 150px;
@@ -102,21 +102,11 @@
         <p class="info-label">Kelas:</p>
         <p id="studentKelas" class="info-value">-</p>
     </div>
-</div>
-<div id="profileContainer">
-        <img id="studentPhoto" src="" alt="Foto Siswa">
-        
-        <p class="info-label">Nama Siswa:</p>
-        <p id="studentName" class="info-value">-</p>
-        
-        <p class="info-label">Kelas:</p>
-        <p id="studentKelas" class="info-value">-</p>
-    </div>
 
     <a href="pengaturan.html" style="display: block; margin-top: 30px; text-decoration: none; color: #9ca3af; font-size: 14px;">
         ⚙️ Pengaturan Admin
     </a>
-    </div> 
+</div> 
     
 <script>
     const scanButton = document.getElementById("scanButton");
@@ -127,7 +117,7 @@
     const studentName = document.getElementById("studentName");
     const studentKelas = document.getElementById("studentKelas");
 
-    // PASTIKAN URL INI SESUAI DENGAN WEB APP ANDA
+    // URL WEB APP ANDA
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
 
     let ndef = null;
@@ -166,7 +156,7 @@
                 statusDiv.innerText = "Status: Mencari data & mencatat absen...";
                 statusDiv.style.color = "#2563eb"; 
                 
-                // Efek visual: Buat profil agak transparan saat sedang loading kartu baru
+                // Efek visual transparan saat loading
                 if (profileContainer.style.display === "block") {
                     profileContainer.style.opacity = "0.5";
                 }
@@ -184,16 +174,15 @@
                         
                         studentName.innerText = data.nama;
                         studentKelas.innerText = data.kelas;
-                        // Memastikan sistem memanggil file dari folder "foto" di GitHub Anda
+                        
+                        // Menampilkan foto
                         if (data.foto && data.foto.trim() !== "") {
-                            // URL relatif: mencari file di dalam folder 'foto'
                             studentPhoto.src = "foto/" + data.foto;
                         } else {
-                            // Jika kolom foto di database kosong
                             studentPhoto.src = "https://via.placeholder.com/150x180?text=Tanpa+Foto"; 
                         }
                         
-                        // Tambahan: Jika file foto gagal dimuat (misal nama tidak cocok), tampilkan gambar error
+                        // Gambar error jika nama foto tidak ada di folder GitHub
                         studentPhoto.onerror = function() {
                             this.src = "https://via.placeholder.com/150x180?text=Foto+Tidak+Ditemukan";
                         };
@@ -225,9 +214,6 @@
                 setTimeout(() => {
                     statusDiv.innerText = "Status: Standby. Silakan Tempelkan Kartu Berikutnya...";
                     statusDiv.style.color = "#d97706";
-                    
-                    // BARIS DI BAWAH INI DIHAPUS agar profil siswa tidak hilang
-                    // profileContainer.style.display = "none"; 
                     
                     isProcessing = false; 
                 }, 3000);
