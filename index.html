@@ -56,6 +56,19 @@
             animation: fadeIn 0.5s ease-in-out;
             transition: opacity 0.3s ease; 
         }
+        
+        /* Desain Keterangan Status di Atas Foto */
+        #attendanceStatusBadge {
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 6px 20px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            color: white;
+        }
+        
         #studentPhoto {
             width: 150px;
             height: 180px;
@@ -94,6 +107,8 @@
     <div id="log">---</div>
     
     <div id="profileContainer">
+        <div id="attendanceStatusBadge">-</div>
+        <br>
         <img id="studentPhoto" src="" alt="Foto Siswa">
         
         <p class="info-label">Nama Siswa:</p>
@@ -113,11 +128,12 @@
     const statusDiv = document.getElementById("status");
     const logDiv = document.getElementById("log");
     const profileContainer = document.getElementById("profileContainer");
+    const attendanceStatusBadge = document.getElementById("attendanceStatusBadge");
     const studentPhoto = document.getElementById("studentPhoto");
     const studentName = document.getElementById("studentName");
     const studentKelas = document.getElementById("studentKelas");
 
-    // URL WEB APP ANDA
+    // URL WEB APP APPS SCRIPT
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
 
     let ndef = null;
@@ -152,11 +168,9 @@
                 
                 const uid = serialNumber.replace(/:/g, "").toUpperCase();
                 logDiv.innerText = "Membaca ID Kartu: " + uid;
-                
                 statusDiv.innerText = "Status: Mencari data & mencatat absen...";
                 statusDiv.style.color = "#2563eb"; 
                 
-                // Efek visual transparan saat loading
                 if (profileContainer.style.display === "block") {
                     profileContainer.style.opacity = "0.5";
                 }
@@ -165,34 +179,61 @@
                     const response = await fetch(`${APPS_SCRIPT_URL}?uid=${uid}`);
                     const data = await response.json();
                     
-                    // Kembalikan transparansi penuh
                     profileContainer.style.opacity = "1";
                     
-                    if (data.status === "success") {
-                        statusDiv.innerText = "Status: " + data.message;
-                        statusDiv.style.color = "#16a34a"; 
-                        
+                    if (data.status === "success" || data.status === "already") {
+                        // Tampilkan Data Profil Siswa
                         studentName.innerText = data.nama;
                         studentKelas.innerText = data.kelas;
+                        attendanceStatusBadge.innerText = data.statusAbsen;
                         
-                        // Menampilkan foto
+                        // Handler Foto Git
                         if (data.foto && data.foto.trim() !== "") {
                             studentPhoto.src = "foto/" + data.foto;
                         } else {
                             studentPhoto.src = "https://via.placeholder.com/150x180?text=Tanpa+Foto"; 
                         }
                         
-                        // Gambar error jika nama foto tidak ada di folder GitHub
                         studentPhoto.onerror = function() {
                             this.src = "https://via.placeholder.com/150x180?text=Foto+Tidak+Ditemukan";
                         };
                         
                         profileContainer.style.display = "block";
-                        profileContainer.style.backgroundColor = "#f0fdf4";
-                        profileContainer.style.borderColor = "#bbf7d0";
+
+                        // JIKA BERHASIL ABSEN (BARU)
+                        if (data.status === "success") {
+                            statusDiv.innerText = "Status: " + data.message;
+                            statusDiv.style.color = "#16a34a";
+                            
+                            profileContainer.style.backgroundColor = "#f0fdf4";
+                            profileContainer.style.borderColor = "#bbf7d0";
+                            studentPhoto.style.borderColor = "#10b981";
+                            
+                            // Warna Badge Status (Hijau untuk Masuk/Pulang, Kuning Emas jika Terlambat)
+                            if (data.statusAbsen === "TERLAMBAT") {
+                                attendanceStatusBadge.style.backgroundColor = "#d97706";
+                            } else {
+                                attendanceStatusBadge.style.backgroundColor = "#10b981";
+                            }
+                        } 
+                        // JIKA DIHENTIKAN KARENA DUPLIKAT (SUDAH ABSEN SEBELUMNYA)
+                        else {
+                            statusDiv.innerText = "Peringatan: " + data.message;
+                            statusDiv.style.color = "#d97706";
+                            
+                            profileContainer.style.backgroundColor = "#fffbeb"; // Box Kuning
+                            profileContainer.style.borderColor = "#fef3c7";
+                            studentPhoto.style.borderColor = "#d97706";
+                            attendanceStatusBadge.style.backgroundColor = "#dc2626"; // Badge Merah (Peringatan)
+                        }
+
                     } else {
+                        // KARTU TIDAK DIKENAL
                         statusDiv.innerText = "Status: " + data.message;
                         statusDiv.style.color = "#dc2626"; 
+                        
+                        attendanceStatusBadge.innerText = "DITOLAK";
+                        attendanceStatusBadge.style.backgroundColor = "#7f1d1d";
                         
                         studentName.innerText = "KARTU TIDAK DIKENAL";
                         studentKelas.innerText = "Belum Terdaftar";
@@ -201,6 +242,7 @@
                         profileContainer.style.display = "block";
                         profileContainer.style.backgroundColor = "#fef2f2";
                         profileContainer.style.borderColor = "#fecaca";
+                        studentPhoto.style.borderColor = "#dc2626";
                     }
 
                 } catch (err) {
@@ -210,11 +252,12 @@
                     logDiv.innerText = err.message;
                 }
 
-                // JEDA COOLDOWN (3 Detik)
+                // COOLDOWN SCANNER (3 Detik)
                 setTimeout(() => {
                     statusDiv.innerText = "Status: Standby. Silakan Tempelkan Kartu Berikutnya...";
-                    statusDiv.style.color = "#d97706";
-                    
+                    if(statusDiv.style.color !== "rgb(220, 38, 38)") { // jika bukan error merah
+                        statusDiv.style.color = "#d97706";
+                    }
                     isProcessing = false; 
                 }, 3000);
             });
