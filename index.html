@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Absensi</title>
+</head>
+<body>
+    <h1>Absen Siswa</h1>
+    <input type="text" id="inputCode" placeholder="Tap Kartu atau Scan QR" autofocus>
+    <button onclick="kirimData()">Absen</button>
+
+    <div id="hasil"></div>
+
+    <script>
+        // Ganti dengan URL Web App dari Apps Script Anda
+        const urlAPI = "https://script.google.com/macros/s/AKfycbyRu8UmdQqMqziPk_3ARCbKF-QxG2Iz-796tDunwmwtiAdX5bSk8uavzZTYwAVMOZluMg/exec";
+
+        // Fitur Auto-Enter saat kartu di-tap
+        document.getElementById("inputCode").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                kirimData();
+            }
+        });
+
+        function kirimData() {
+            let idInput = document.getElementById("inputCode").value;
+            let hasilDiv = document.getElementById("hasil");
+            hasilDiv.innerHTML = "Memproses...";
+
+            // Mengirim data ke Apps Script
+            fetch(urlAPI + "?id=" + idInput, { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        hasilDiv.innerHTML = `<h2 style="color:green;">${data.pesan}</h2>
+                                              <p>Nama: ${data.nama}</p>
+                                              <p>Kelas: ${data.kelas}</p>`;
+                    } else {
+                        hasilDiv.innerHTML = `<h2 style="color:red;">${data.pesan}</h2>`;
+                    }
+                    // Kosongkan input untuk absen selanjutnya
+                    document.getElementById("inputCode").value = "";
+                    document.getElementById("inputCode").focus();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
