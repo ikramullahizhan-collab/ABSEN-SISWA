@@ -59,7 +59,7 @@
         
         /* Desain Keterangan Status di Atas Foto */
         #attendanceStatusBadge {
-            display: inline-block;
+            display: none; /* KITA SEMBUNYIKAN SECARA BAWAAN */
             font-size: 18px;
             font-weight: bold;
             padding: 6px 20px;
@@ -133,7 +133,7 @@
     const studentName = document.getElementById("studentName");
     const studentKelas = document.getElementById("studentKelas");
 
-    // URL WEB APP APPS SCRIPT
+    // PASTIKAN URL WEB APP INI SUDAH BENAR
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
 
     let ndef = null;
@@ -182,12 +182,10 @@
                     profileContainer.style.opacity = "1";
                     
                     if (data.status === "success" || data.status === "already") {
-                        // Tampilkan Data Profil Siswa
+                        
                         studentName.innerText = data.nama;
                         studentKelas.innerText = data.kelas;
-                        attendanceStatusBadge.innerText = data.statusAbsen;
                         
-                        // Handler Foto Git
                         if (data.foto && data.foto.trim() !== "") {
                             studentPhoto.src = "foto/" + data.foto;
                         } else {
@@ -200,31 +198,29 @@
                         
                         profileContainer.style.display = "block";
 
-                        // JIKA BERHASIL ABSEN (BARU)
+                        // 1. JIKA BARU ABSEN PERTAMA KALI
                         if (data.status === "success") {
+                            attendanceStatusBadge.style.display = "none"; // Sembunyikan badge keterangan
+                            
                             statusDiv.innerText = "Status: " + data.message;
                             statusDiv.style.color = "#16a34a";
                             
                             profileContainer.style.backgroundColor = "#f0fdf4";
                             profileContainer.style.borderColor = "#bbf7d0";
                             studentPhoto.style.borderColor = "#10b981";
-                            
-                            // Warna Badge Status (Hijau untuk Masuk/Pulang, Kuning Emas jika Terlambat)
-                            if (data.statusAbsen === "TERLAMBAT") {
-                                attendanceStatusBadge.style.backgroundColor = "#d97706";
-                            } else {
-                                attendanceStatusBadge.style.backgroundColor = "#10b981";
-                            }
                         } 
-                        // JIKA DIHENTIKAN KARENA DUPLIKAT (SUDAH ABSEN SEBELUMNYA)
+                        // 2. JIKA CEK KARTU (SUDAH ABSEN SEBELUMNYA)
                         else {
+                            attendanceStatusBadge.innerText = data.statusAbsen; // Tampilkan teks status awal (contoh: SUDAH TERLAMBAT)
+                            attendanceStatusBadge.style.display = "inline-block"; // Munculkan badge keterangan
+                            attendanceStatusBadge.style.backgroundColor = "#dc2626"; // Badge warna merah (peringatan)
+                            
                             statusDiv.innerText = "Peringatan: " + data.message;
                             statusDiv.style.color = "#d97706";
                             
-                            profileContainer.style.backgroundColor = "#fffbeb"; // Box Kuning
+                            profileContainer.style.backgroundColor = "#fffbeb"; 
                             profileContainer.style.borderColor = "#fef3c7";
                             studentPhoto.style.borderColor = "#d97706";
-                            attendanceStatusBadge.style.backgroundColor = "#dc2626"; // Badge Merah (Peringatan)
                         }
 
                     } else {
@@ -233,6 +229,7 @@
                         statusDiv.style.color = "#dc2626"; 
                         
                         attendanceStatusBadge.innerText = "DITOLAK";
+                        attendanceStatusBadge.style.display = "inline-block"; // Munculkan badge
                         attendanceStatusBadge.style.backgroundColor = "#7f1d1d";
                         
                         studentName.innerText = "KARTU TIDAK DIKENAL";
@@ -252,10 +249,9 @@
                     logDiv.innerText = err.message;
                 }
 
-                // COOLDOWN SCANNER (3 Detik)
                 setTimeout(() => {
                     statusDiv.innerText = "Status: Standby. Silakan Tempelkan Kartu Berikutnya...";
-                    if(statusDiv.style.color !== "rgb(220, 38, 38)") { // jika bukan error merah
+                    if(statusDiv.style.color !== "rgb(220, 38, 38)") { 
                         statusDiv.style.color = "#d97706";
                     }
                     isProcessing = false; 
