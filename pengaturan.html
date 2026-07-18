@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengaturan Jam Absensi Sekolah</title>
+    <title>Pengaturan Admin Absensi</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f3f4f6;
+            text-align: center;
             padding: 40px 20px;
+            background-color: #f3f4f6;
             color: #333;
         }
         .container {
-            max-width: 400px;
+            max-width: 450px;
             margin: 0 auto;
             background: white;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        h2 { text-align: center; color: #1e3a8a; margin-bottom: 25px; }
+        h2 { text-align: center; margin-bottom: 25px; color: #111827; }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-align: left;
         }
         label {
@@ -37,141 +38,246 @@
             border: 2px solid #d1d5db;
             border-radius: 8px;
             box-sizing: border-box;
+            background-color: #f9fafb;
         }
         input[type="time"]:focus {
-            border-color: #2563eb;
+            border-color: #10b981;
             outline: none;
         }
-        .btn {
-            width: 100%;
+        
+        /* ---------------------------------------------------- */
+        /* CSS KHUSUS TOMBOL GESER (TOGGLE SWITCH)              */
+        /* ---------------------------------------------------- */
+        .toggle-wrapper {
+            display: block;
+            position: relative;
+            background: #f9fafb;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        .toggle-header {
+            display: block;
+            float: left;
+            width: 70%;
+        }
+        .toggle-status {
+            font-weight: bold;
+            font-size: 14px;
+            display: block;
+            margin-top: 2px;
+        }
+        .switch {
+            position: relative;
+            display: block;
+            float: right;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #10b981;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #10b981;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        /* ---------------------------------------------------- */
+
+        .btn-submit {
             padding: 14px;
             font-size: 16px;
             font-weight: bold;
             color: white;
-            background-color: #2563eb;
+            background-color: #10b981;
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            width: 100%;
             transition: background 0.3s;
             margin-top: 10px;
         }
-        .btn:hover { background-color: #1d4ed8; }
-        .btn:disabled { background-color: #9ca3af; }
-        #statusMessage {
-            margin-top: 20px;
-            font-weight: bold;
-            text-align: center;
-            padding: 10px;
-            border-radius: 8px;
-            display: none;
-        }
-        .success { background-color: #dcfce7; color: #15803d; }
-        .error { background-color: #fee2e2; color: #b91c1c; }
-        .nav-link {
+        .btn-submit:hover { background-color: #059669; }
+        .btn-back {
             display: block;
             text-align: center;
             margin-top: 20px;
-            color: #2563eb;
             text-decoration: none;
+            color: #4b5563;
             font-size: 14px;
+        }
+        .btn-back:hover { color: #111827; }
+        #message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            text-align: center;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Konfigurasi Absensi</h2>
+    <h2>⚙️ Pengaturan E-Absensi</h2>
     
-    <div class="form-group">
-        <label for="jamMasuk">Batas Jam Masuk (Tepat Waktu):</label>
-        <input type="time" id="jamMasuk" required>
-    </div>
+    <form id="configForm">
+        <div class="form-group">
+            <label for="jamMasuk">Batas Jam Masuk Sekolah:</label>
+            <input type="time" id="jamMasuk" required>
+            <small style="color:#6b7280; display:block; margin-top:5px;">Siswa scan sebelum jam ini dicatat 'Masuk', setelah ini 'Terlambat'.</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="jamPulang">Jam Pulang Sekolah:</label>
+            <input type="time" id="jamPulang" required>
+            <small style="color:#6b7280; display:block; margin-top:5px;">Siswa baru bisa melakukan scan pulang setelah jam ini dimulai.</small>
+        </div>
+
+        <div class="form-group">
+            <label>Jadwal Hari Libur Akhir Pekan:</label>
+            <div class="toggle-wrapper clearfix">
+                <div class="toggle-header">
+                    <span style="font-size: 15px; font-weight: 500;">Libur Sabtu & Minggu</span>
+                    <span id="toggleText" class="toggle-status" style="color: #10b981;">AKTIF (Sistem Libur)</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="liburWeekendToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <small style="color:#6b7280; display:block; margin-top:8px;">Geser ke kanan (Hijau) untuk mengunci sistem pada Sabtu-Minggu. Geser ke kiri (Abu-abu) jika sekolah masuk.</small>
+        </div>
+        
+        <button type="submit" class="btn-submit">Simpan Pengaturan</button>
+    </form>
     
-    <div class="form-group">
-        <label for="jamPulang">Jam Pulang Sekolah:</label>
-        <input type="time" id="jamPulang" required>
-    </div>
+    <div id="message"></div>
     
-    <button id="btnSimpan" class="btn">Simpan Pengaturan</button>
-    
-    <div id="statusMessage"></div>
-    
-    <a href="index.html" class="nav-link">← Kembali ke Halaman Absen</a>
+    <a href="index.html" class="btn-back">⬅️ Kembali ke Menu Absensi</a>
 </div>
 
 <script>
-    const jamMasukInput = document.getElementById("jamMasuk");
-    const jamPulangInput = document.getElementById("jamPulang");
-    const btnSimpan = document.getElementById("btnSimpan");
-    const statusMessage = document.getElementById("statusMessage");
-
-    // PASTIKAN URL WEB APP APPS SCRIPT ANDA DI SINI
+    const form = document.getElementById("configForm");
+    const messageDiv = document.getElementById("message");
+    const toggleInput = document.getElementById("liburWeekendToggle");
+    const toggleText = document.getElementById("toggleText");
+    
+    // UTAMA: SILAKAN GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
 
-    // 1. Ambil data jam saat ini dari Google Sheets sewaktu halaman dibuka
-    async function loadCurrentConfig() {
-        btnSimpan.disabled = true;
-        showStatus("Memuat jam saat ini dari server...", "success");
-        try {
-            const response = await fetch(`${APPS_SCRIPT_URL}?action=get_config`);
-            const data = await response.json();
-            if (data.status === "success") {
-                if (data.config.JAM_MASUK) jamMasukInput.value = data.config.JAM_MASUK;
-                if (data.config.JAM_PULANG) jamPulangInput.value = data.config.JAM_PULANG;
-                statusMessage.style.display = "none";
-            }
-        } catch (error) {
-            showStatus("Gagal memuat data saat ini dari Google Sheets.", "error");
-        } finally {
-            btnSimpan.disabled = false;
-        }
-    }
-
-    // 2. Fungsi Kirim & Simpan Jam Baru via POST
-    btnSimpan.addEventListener("click", async () => {
-        const jamMasuk = jamMasukInput.value;
-        const jamPulang = jamPulangInput.value;
-
-        if (!jamMasuk || !jamPulang) {
-            showStatus("Harap isi kedua waktu tersebut!", "error");
-            return;
-        }
-
-        btnSimpan.disabled = true;
-        showStatus("Sedang menyimpan pengaturan...", "success");
-
-        try {
-            const response = await fetch(APPS_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors", // Mengatasi masalah CORS pada Google Apps Script Redirect
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    jam_masuk: jamMasuk,
-                    jam_pulang: jamPulang
-                })
-            });
-
-            // Karena mode 'no-cors', kita tidak bisa membaca json response langsung, 
-            // namun jika lolos ke tahap ini berarti data sukses terkirim ke server Apps Script.
-            showStatus("Pengaturan berhasil disimpan!", "success");
-            
-        } catch (error) {
-            showStatus("Terjadi kesalahan jaringan saat menyimpan.", "error");
-        } finally {
-            btnSimpan.disabled = false;
+    // Fungsi mengubah teks keterangan ketika tombol digeser secara manual
+    toggleInput.addEventListener("change", function() {
+        if (this.checked) {
+            toggleText.innerText = "AKTIF (Sistem Libur)";
+            toggleText.style.color = "#10b981";
+        } else {
+            toggleText.innerText = "NONAKTIF (Tetap Masuk)";
+            toggleText.style.color = "#6b7280";
         }
     });
 
-    function showStatus(text, type) {
-        statusMessage.innerText = text;
-        statusMessage.className = type;
-        statusMessage.style.display = "block";
+    // 1. Ambil konfigurasi saat halaman dibuka
+    async function fetchConfig() {
+        try {
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=get_config`);
+            const data = await response.json();
+            if (data.status === "success" && data.config) {
+                if (data.config.JAM_MASUK) document.getElementById("jamMasuk").value = data.config.JAM_MASUK;
+                if (data.config.JAM_PULANG) document.getElementById("jamPulang").value = data.config.JAM_PULANG;
+                
+                // Set posisi awal tombol geser berdasarkan database Google Sheets
+                if (data.config.LIBUR_AKHIR_PEKAN === "YA") {
+                    toggleInput.checked = true;
+                    toggleText.innerText = "AKTIF (Sistem Libur)";
+                    toggleText.style.color = "#10b981";
+                } else {
+                    toggleInput.checked = false;
+                    toggleText.innerText = "NONAKTIF (Tetap Masuk)";
+                    toggleText.style.color = "#6b7280";
+                }
+            }
+        } catch (error) {
+            console.error("Gagal memuat pengaturan:", error);
+        }
     }
 
-    // Jalankan fungsi load data otomatis saat halaman selesai dimuat
-    window.onload = loadCurrentConfig;
+    // 2. Kirim data baru saat form disimpan
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        messageDiv.style.display = "block";
+        messageDiv.innerText = "Sedang menyimpan perubahan...";
+        messageDiv.style.backgroundColor = "#e0f2fe";
+        messageDiv.style.color = "#0369a1";
+        
+        // Konversi status checkbox (true/false) menjadi teks (YA/TIDAK) untuk dikirim ke Google Sheets
+        const statusLibur = toggleInput.checked ? "YA" : "TIDAK";
+        
+        const payload = {
+            jam_masuk: document.getElementById("jamMasuk").value,
+            jam_pulang: document.getElementById("jamPulang").value,
+            libur_akhir_pekan: statusLibur
+        };
+        
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify(payload)
+            });
+            
+            messageDiv.innerText = "Pengaturan berhasil diperbarui di Google Sheets!";
+            messageDiv.style.backgroundColor = "#dcfce7";
+            messageDiv.style.color = "#15803d";
+            
+            setTimeout(() => { messageDiv.style.display = "none"; }, 4000);
+        } catch (err) {
+            messageDiv.innerText = "Terjadi kesalahan saat menyimpan data.";
+            messageDiv.style.backgroundColor = "#fee2e2";
+            messageDiv.style.color = "#b91c1c";
+        }
+    });
+
+    // Muat konfigurasi saat pertama kali masuk halaman
+    fetchConfig();
 </script>
 
 </body>
