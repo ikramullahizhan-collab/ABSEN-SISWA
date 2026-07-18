@@ -225,19 +225,24 @@
 
     function startCamera() {
         if(!html5QrCode) {
-            // TRIK 1: Fokus HANYA pada QR Code agar pemrosesan secepat kilat
             html5QrCode = new Html5Qrcode("reader", { 
                 formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ] 
             });
         }
         
+        // JURUS 1: Memaksa browser meminta fitur fokus otomatis terus-menerus
+        const cameraConstraints = {
+            facingMode: "environment",
+            advanced: [{ focusMode: "continuous" }]
+        };
+
         html5QrCode.start(
-            { facingMode: "environment" }, 
+            cameraConstraints, 
             { 
-                // TRIK 2: Naikkan FPS dari 10 ke 30 agar lebih sensitif
                 fps: 30, 
-                qrbox: { width: 180, height: 180 },
-                // Menonaktifkan pencarian terbalik untuk menghemat memori
+                // JURUS 2: qrbox DIHAPUS. 
+                // Akibatnya, scanner akan membaca SELURUH area video (seperti QRIS).
+                // Sangat cepat karena siswa tidak perlu mencocokkan QR ke dalam kotak.
                 disableFlip: true 
             }, 
             (decodedText, decodedResult) => {
@@ -245,9 +250,11 @@
                 const uid = decodedText.trim().toUpperCase();
                 processAttendance(uid);
             },
-            (errorMessage) => { }
+            (errorMessage) => { 
+                // Error scanning frame wajar terjadi, biarkan kosong agar tidak memberatkan browser
+            }
         ).then(() => {
-            statusDiv.innerText = "Kamera Aktif! Menunggu QR Code...";
+            statusDiv.innerText = "Kamera Aktif! Arahkan QR Code...";
             statusDiv.style.color = "#4b5563";
         }).catch(err => {
             statusDiv.innerText = "Gagal membuka kamera.";
