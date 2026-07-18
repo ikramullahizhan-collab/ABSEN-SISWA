@@ -8,30 +8,26 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            padding: 40px 20px;
+            padding: 20px;
             background-color: #f3f4f6;
             color: #333;
         }
         .container {
-            max-width: 450px;
+            max-width: 500px;
             margin: 0 auto;
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: left;
+            margin-bottom: 20px;
         }
         h2 { text-align: center; margin-bottom: 25px; color: #111827; }
-        .form-group {
-            margin-bottom: 25px;
-            text-align: left;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #4b5563;
-        }
-        input[type="time"] {
+        h3 { color: #1f2937; margin-bottom: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; }
+        
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #4b5563; }
+        input[type="time"], input[type="date"], input[type="text"] {
             width: 100%;
             padding: 12px;
             font-size: 16px;
@@ -40,169 +36,135 @@
             box-sizing: border-box;
             background-color: #f9fafb;
         }
-        input[type="time"]:focus {
-            border-color: #10b981;
-            outline: none;
-        }
+        input:focus { border-color: #10b981; outline: none; }
         
-        /* ---------------------------------------------------- */
-        /* CSS KHUSUS TOMBOL GESER (TOGGLE SWITCH)              */
-        /* ---------------------------------------------------- */
+        /* Toggle Switch */
         .toggle-wrapper {
-            display: block;
-            position: relative;
-            background: #f9fafb;
-            padding: 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            margin-top: 5px;
+            display: block; position: relative; background: #f9fafb;
+            padding: 15px; border: 2px solid #e5e7eb; border-radius: 10px; margin-top: 5px;
         }
-        .toggle-header {
-            display: block;
-            float: left;
-            width: 70%;
-        }
-        .toggle-status {
-            font-weight: bold;
-            font-size: 14px;
-            display: block;
-            margin-top: 2px;
-        }
-        .switch {
-            position: relative;
-            display: block;
-            float: right;
-            width: 60px;
-            height: 34px;
-        }
-        .switch input { 
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .toggle-header { display: block; float: left; width: 70%; }
+        .toggle-status { font-weight: bold; font-size: 14px; display: block; margin-top: 2px; }
+        .switch { position: relative; display: block; float: right; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 34px;
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 34px;
         }
         .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 50%;
+            position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px;
+            background-color: white; transition: .4s; border-radius: 50%;
         }
-        input:checked + .slider {
-            background-color: #10b981;
-        }
-        input:focus + .slider {
-            box-shadow: 0 0 1px #10b981;
-        }
-        input:checked + .slider:before {
-            -webkit-transform: translateX(26px);
-            -ms-transform: translateX(26px);
-            transform: translateX(26px);
-        }
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-        /* ---------------------------------------------------- */
+        input:checked + .slider { background-color: #10b981; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .clearfix::after { content: ""; clear: both; display: table; }
 
         .btn-submit {
-            padding: 14px;
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            background-color: #10b981;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
-            margin-top: 10px;
+            padding: 14px; font-size: 16px; font-weight: bold; color: white;
+            background-color: #10b981; border: none; border-radius: 8px;
+            cursor: pointer; width: 100%; transition: background 0.3s; margin-top: 10px;
         }
         .btn-submit:hover { background-color: #059669; }
+        .btn-blue { background-color: #3b82f6; }
+        .btn-blue:hover { background-color: #2563eb; }
+        
         .btn-back {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            text-decoration: none;
-            color: #4b5563;
-            font-size: 14px;
+            display: block; text-align: center; margin-top: 20px;
+            text-decoration: none; color: #4b5563; font-size: 14px; font-weight: bold;
         }
-        .btn-back:hover { color: #111827; }
-        #message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 6px;
-            display: none;
-            text-align: center;
-            font-weight: bold;
+        
+        /* Tabel Libur */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+        th { background-color: #f3f4f6; color: #374151; }
+        
+        .message-box {
+            margin-top: 15px; padding: 10px; border-radius: 6px;
+            display: none; text-align: center; font-weight: bold;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>⚙️ Pengaturan E-Absensi</h2>
+    <h2>⚙️ Pengaturan Dasar</h2>
     
     <form id="configForm">
         <div class="form-group">
-            <label for="jamMasuk">Batas Jam Masuk Sekolah:</label>
+            <label>Batas Jam Masuk Sekolah:</label>
             <input type="time" id="jamMasuk" required>
-            <small style="color:#6b7280; display:block; margin-top:5px;">Siswa scan sebelum jam ini dicatat 'Masuk', setelah ini 'Terlambat'.</small>
         </div>
         
         <div class="form-group">
-            <label for="jamPulang">Jam Pulang Sekolah:</label>
+            <label>Jam Pulang Sekolah:</label>
             <input type="time" id="jamPulang" required>
-            <small style="color:#6b7280; display:block; margin-top:5px;">Siswa baru bisa melakukan scan pulang setelah jam ini dimulai.</small>
         </div>
 
         <div class="form-group">
             <label>Jadwal Hari Libur Akhir Pekan:</label>
             <div class="toggle-wrapper clearfix">
                 <div class="toggle-header">
-                    <span style="font-size: 15px; font-weight: 500;">Libur Sabtu & Minggu</span>
-                    <span id="toggleText" class="toggle-status" style="color: #10b981;">AKTIF (Sistem Libur)</span>
+                    <span style="font-size: 15px; font-weight: 500;">Sabtu & Minggu</span>
+                    <span id="toggleText" class="toggle-status" style="color: #10b981;">AKTIF (Libur)</span>
                 </div>
                 <label class="switch">
                     <input type="checkbox" id="liburWeekendToggle">
                     <span class="slider round"></span>
                 </label>
             </div>
-            <small style="color:#6b7280; display:block; margin-top:8px;">Geser ke kanan (Hijau) untuk mengunci sistem pada Sabtu-Minggu. Geser ke kiri (Abu-abu) jika sekolah masuk.</small>
         </div>
         
         <button type="submit" class="btn-submit">Simpan Pengaturan</button>
     </form>
+    <div id="msgConfig" class="message-box"></div>
+</div>
+
+<div class="container">
+    <h3>📅 Tambah Hari Libur (Tanggal Merah)</h3>
     
-    <div id="message"></div>
-    
-    <a href="index.html" class="btn-back">⬅️ Kembali ke Menu Absensi</a>
+    <form id="liburForm">
+        <div class="form-group">
+            <label>Pilih Tanggal:</label>
+            <input type="date" id="tglLibur" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Keterangan Libur:</label>
+            <input type="text" id="ketLibur" placeholder="Contoh: Maulid Nabi / Rapat Guru" required>
+        </div>
+        
+        <button type="submit" class="btn-submit btn-blue">+ Tambahkan Ke Kalender</button>
+    </form>
+    <div id="msgLibur" class="message-box"></div>
+
+    <h3 style="margin-top: 30px;">Daftar Hari Libur Terdaftar</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Keterangan</th>
+            </tr>
+        </thead>
+        <tbody id="tabelLibur">
+            <tr><td colspan="2" style="text-align:center;">Memuat data...</td></tr>
+        </tbody>
+    </table>
+    <small style="color: #9ca3af; display: block; margin-top: 10px;">*Untuk menghapus libur yang salah input, silakan hapus barisnya langsung melalui Google Sheets.</small>
+
+    <a href="index.html" class="btn-back">⬅️ KEMBALI KE MENU ABSENSI</a>
 </div>
 
 <script>
-    const form = document.getElementById("configForm");
-    const messageDiv = document.getElementById("message");
+    const configForm = document.getElementById("configForm");
+    const liburForm = document.getElementById("liburForm");
     const toggleInput = document.getElementById("liburWeekendToggle");
     const toggleText = document.getElementById("toggleText");
+    const tabelLibur = document.getElementById("tabelLibur");
     
-    // UTAMA: SILAKAN GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
+    // GANTI DENGAN URL WEB APP ANDA YANG BARU DI-DEPLOY
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
 
-    // Fungsi mengubah teks keterangan ketika tombol digeser secara manual
+    // Efek Teks Sakelar
     toggleInput.addEventListener("change", function() {
         if (this.checked) {
             toggleText.innerText = "AKTIF (Sistem Libur)";
@@ -213,17 +175,17 @@
         }
     });
 
-    // 1. Ambil konfigurasi saat halaman dibuka
-    async function fetchConfig() {
+    // 1. Muat Data Pengaturan & Tabel Libur
+    async function fetchData() {
         try {
-            const response = await fetch(`${APPS_SCRIPT_URL}?action=get_config`);
-            const data = await response.json();
-            if (data.status === "success" && data.config) {
-                if (data.config.JAM_MASUK) document.getElementById("jamMasuk").value = data.config.JAM_MASUK;
-                if (data.config.JAM_PULANG) document.getElementById("jamPulang").value = data.config.JAM_PULANG;
+            // Ambil Config Jam & Toggle
+            const resConfig = await fetch(`${APPS_SCRIPT_URL}?action=get_config`);
+            const dataConfig = await resConfig.json();
+            if (dataConfig.status === "success" && dataConfig.config) {
+                if (dataConfig.config.JAM_MASUK) document.getElementById("jamMasuk").value = dataConfig.config.JAM_MASUK;
+                if (dataConfig.config.JAM_PULANG) document.getElementById("jamPulang").value = dataConfig.config.JAM_PULANG;
                 
-                // Set posisi awal tombol geser berdasarkan database Google Sheets
-                if (data.config.LIBUR_AKHIR_PEKAN === "YA") {
+                if (dataConfig.config.LIBUR_AKHIR_PEKAN === "YA") {
                     toggleInput.checked = true;
                     toggleText.innerText = "AKTIF (Sistem Libur)";
                     toggleText.style.color = "#10b981";
@@ -233,51 +195,98 @@
                     toggleText.style.color = "#6b7280";
                 }
             }
+
+            // Ambil Daftar Hari Libur
+            const resLibur = await fetch(`${APPS_SCRIPT_URL}?action=get_libur`);
+            const dataLibur = await resLibur.json();
+            
+            tabelLibur.innerHTML = ""; // Bersihkan tabel
+            if (dataLibur.status === "success" && dataLibur.data.length > 0) {
+                dataLibur.data.forEach(item => {
+                    tabelLibur.innerHTML += `<tr>
+                        <td style="font-weight:bold;">${item.tanggal}</td>
+                        <td>${item.keterangan}</td>
+                    </tr>`;
+                });
+            } else {
+                tabelLibur.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#9ca3af;">Belum ada hari libur terdaftar</td></tr>`;
+            }
+
         } catch (error) {
-            console.error("Gagal memuat pengaturan:", error);
+            console.error("Gagal memuat data:", error);
         }
     }
 
-    // 2. Kirim data baru saat form disimpan
-    form.addEventListener("submit", async (e) => {
+    // 2. Simpan Pengaturan Dasar (Panel Atas)
+    configForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        
-        messageDiv.style.display = "block";
-        messageDiv.innerText = "Sedang menyimpan perubahan...";
-        messageDiv.style.backgroundColor = "#e0f2fe";
-        messageDiv.style.color = "#0369a1";
-        
-        // Konversi status checkbox (true/false) menjadi teks (YA/TIDAK) untuk dikirim ke Google Sheets
-        const statusLibur = toggleInput.checked ? "YA" : "TIDAK";
+        const msg = document.getElementById("msgConfig");
+        showMessage(msg, "Sedang menyimpan...", "blue");
         
         const payload = {
+            action: "save_config",
             jam_masuk: document.getElementById("jamMasuk").value,
             jam_pulang: document.getElementById("jamPulang").value,
-            libur_akhir_pekan: statusLibur
+            libur_akhir_pekan: toggleInput.checked ? "YA" : "TIDAK"
         };
         
         try {
             await fetch(APPS_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
+                method: "POST", mode: "no-cors",
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify(payload)
+            });
+            showMessage(msg, "Pengaturan berhasil disimpan!", "green");
+        } catch (err) {
+            showMessage(msg, "Gagal menyimpan data.", "red");
+        }
+    });
+
+    // 3. Tambah Hari Libur Baru (Panel Bawah)
+    liburForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById("msgLibur");
+        const tgl = document.getElementById("tglLibur").value;
+        const ket = document.getElementById("ketLibur").value;
+        
+        showMessage(msg, "Menambahkan ke kalender...", "blue");
+        
+        const payload = {
+            action: "add_libur",
+            tanggal: tgl,
+            keterangan: ket
+        };
+        
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+                method: "POST", mode: "no-cors",
                 headers: { "Content-Type": "text/plain" },
                 body: JSON.stringify(payload)
             });
             
-            messageDiv.innerText = "Pengaturan berhasil diperbarui di Google Sheets!";
-            messageDiv.style.backgroundColor = "#dcfce7";
-            messageDiv.style.color = "#15803d";
+            showMessage(msg, "Berhasil! Kalender diperbarui.", "green");
+            document.getElementById("tglLibur").value = "";
+            document.getElementById("ketLibur").value = "";
             
-            setTimeout(() => { messageDiv.style.display = "none"; }, 4000);
+            // Render ulang tabel (Tunggu 2 detik agar Sheet Google selesai memproses)
+            setTimeout(fetchData, 2000);
+            
         } catch (err) {
-            messageDiv.innerText = "Terjadi kesalahan saat menyimpan data.";
-            messageDiv.style.backgroundColor = "#fee2e2";
-            messageDiv.style.color = "#b91c1c";
+            showMessage(msg, "Gagal menambahkan libur.", "red");
         }
     });
 
-    // Muat konfigurasi saat pertama kali masuk halaman
-    fetchConfig();
+    function showMessage(element, text, colorType) {
+        element.style.display = "block";
+        element.innerText = text;
+        if(colorType === "blue") { element.style.backgroundColor = "#e0f2fe"; element.style.color = "#0369a1"; }
+        if(colorType === "green") { element.style.backgroundColor = "#dcfce7"; element.style.color = "#15803d"; }
+        if(colorType === "red") { element.style.backgroundColor = "#fee2e2"; element.style.color = "#b91c1c"; }
+        setTimeout(() => { element.style.display = "none"; }, 4000);
+    }
+
+    // Jalankan saat load
+    fetchData();
 </script>
 
 </body>
