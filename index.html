@@ -225,20 +225,19 @@
 
     function startCamera() {
         if(!html5QrCode) {
-            // Fokus HANYA pada QR Code agar pemrosesan secepat kilat
+            // Trik 1: Kunci mesin HANYA untuk membaca QR Code
             html5QrCode = new Html5Qrcode("reader", { 
                 formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ] 
             });
         }
         
-        // Kembali ke pengaturan kamera bawaan yang AMAN untuk semua HP
         html5QrCode.start(
             { facingMode: "environment" }, 
             { 
-                // Tetap 30 Frame per Detik agar sangat sensitif
+                // Trik 2: Kecepatan tangkap 30 frame per detik
                 fps: 30, 
-                // qrbox TIDAK DITULIS: Agar area scan membaca seluruh layar (Bebas Target)
-                disableFlip: true 
+                // KEMBALIKAN KOTAK: Tapi ukurannya diperbesar agar lebih mudah membidik
+                qrbox: { width: 250, height: 250 } 
             }, 
             (decodedText, decodedResult) => {
                 if (isProcessing) return;
@@ -246,10 +245,10 @@
                 processAttendance(uid);
             },
             (errorMessage) => { 
-                // Biarkan kosong
+                // Error scanning frame wajar terjadi, biarkan kosong
             }
         ).then(() => {
-            statusDiv.innerText = "Kamera Aktif! Arahkan QR Code...";
+            statusDiv.innerText = "Kamera Aktif! Menunggu QR Code...";
             statusDiv.style.color = "#4b5563";
         }).catch(err => {
             statusDiv.innerText = "Gagal membuka kamera.";
