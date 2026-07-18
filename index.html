@@ -7,7 +7,7 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
     <style>
-        /* Reset & Layout Dasar dengan dvh (Dynamic Viewport Height) */
+        /* Reset & Layout Dasar dengan dvh */
         html, body {
             margin: 0; padding: 0; 
             height: 100%; 
@@ -19,7 +19,7 @@
             position: relative;
         }
 
-        /* BAGIAN ATAS: KAMERA QR CODE (Mutlak 20% Layar) */
+        /* BAGIAN ATAS: KAMERA QR CODE (20% Layar) */
         .camera-section {
             position: absolute;
             top: 0; left: 0; right: 0;
@@ -31,14 +31,31 @@
             overflow: hidden; 
             z-index: 1;
         }
-        #reader { width: 100%; height: 100%; }
+        #reader { width: 100%; height: 100%; position: relative; }
         #reader video {
             object-fit: cover !important; 
             width: 100% !important; 
             height: 100% !important;
         }
 
-        /* BAGIAN BAWAH: PANEL UTAMA (Mutlak 80% Layar) */
+        /* GARIS LASER PEMINDAI ANIMASI */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background-color: #10b981;
+            box-shadow: 0 0 10px #10b981, 0 0 20px #10b981;
+            animation: scan-anim 2s infinite linear;
+            z-index: 10;
+            display: none;
+        }
+        @keyframes scan-anim {
+            0% { top: 0%; }
+            50% { top: 95%; }
+            100% { top: 0%; }
+        }
+
+        /* BAGIAN BAWAH: PANEL UTAMA (80% Layar) */
         .info-section {
             position: absolute;
             bottom: 0; left: 0; right: 0;
@@ -54,7 +71,6 @@
             z-index: 2;
         }
         
-        /* FIX LAYAR PENUH */
         .full-height {
             height: 100% !important;
             padding-top: 70px !important; 
@@ -125,6 +141,7 @@
 
     <div id="cameraSection" class="camera-section">
         <div id="reader"></div>
+        <div id="scanLine" class="scan-line"></div>
     </div>
 
     <div id="infoSection" class="info-section full-height">
@@ -160,6 +177,7 @@
 
 <script>
     const cameraSection = document.getElementById("cameraSection");
+    const scanLine = document.getElementById("scanLine");
     const infoSection = document.getElementById("infoSection");
     const menuSelection = document.getElementById("menuSelection");
     const scanView = document.getElementById("scanView");
@@ -190,12 +208,14 @@
         if (mode === "QR") {
             infoSection.classList.remove("full-height"); 
             cameraSection.style.display = "flex"; 
+            scanLine.style.display = "block"; // Nyalakan laser
             mainSubtitle.innerText = "Arahkan QR Code siswa pada kotak kamera di atas.";
             statusDiv.innerText = "Mengaktifkan kamera...";
             startCamera();
         } 
         else if (mode === "NFC") {
             cameraSection.style.display = "none";
+            scanLine.style.display = "none";
             infoSection.classList.add("full-height"); 
             mainSubtitle.innerText = "Dekatkan kartu RFID siswa ke area sensor NFC di punggung HP Anda.";
             statusDiv.innerText = "Mengaktifkan Sensor NFC...";
@@ -217,6 +237,7 @@
         isProcessing = false;
         
         cameraSection.style.display = "none";
+        scanLine.style.display = "none"; // Matikan laser
         infoSection.classList.add("full-height");
         scanView.style.display = "none";
         menuSelection.style.display = "flex";
@@ -231,14 +252,9 @@
         html5QrCode.start(
             { facingMode: "environment" }, 
             { 
-                fps: 10, 
-                // PERBAIKAN DI SINI: Kotak dinamis agar memunculkan scanner box di area sempit
-                qrbox: function(viewfinderWidth, viewfinderHeight) {
-                    return {
-                        width: Math.min(250, viewfinderWidth * 0.8), // Maksimal lebar 250px atau 80% layar
-                        height: Math.min(100, viewfinderHeight * 0.8) // Maksimal tinggi 100px agar muat di 20%
-                    };
-                }
+                fps: 10
+                // PERBAIKAN: Parameter 'qrbox' dihapus total! 
+                // Kamera sekarang akan membaca keseluruhan area video tanpa memotong tepi QR Code.
             }, 
             (decodedText, decodedResult) => {
                 if (isProcessing) return;
@@ -247,7 +263,7 @@
             },
             (errorMessage) => { }
         ).then(() => {
-            statusDiv.innerText = "Kamera Aktif! Menunggu QR Code...";
+            statusDiv.innerText = "Kamera Aktif! Arahkan QR Code...";
             statusDiv.style.color = "#4b5563";
         }).catch(err => {
             statusDiv.innerText = "Gagal membuka kamera.";
@@ -259,7 +275,7 @@
     async function startNfc() {
         if (!("NDEFReader" in window)) {
             statusDiv.innerText = "Browser tidak mendukung NFC.";
-            logDiv.innerText = "Pastikan Anda menggunakan Google Chrome Android, koneksi aman (HTTPS), dan NFC menyala di pengaturan HP.";
+            logDiv.innerText = "Pastikan Anda menggunakan Google Chrome Android, koneksi aman (HTTPS), dan NFC menyala.";
             statusDiv.style.color = "#dc2626";
             return;
         }
