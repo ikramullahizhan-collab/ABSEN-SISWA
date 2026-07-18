@@ -10,8 +10,8 @@
         /* Reset & Layout Dasar dengan dvh (Dynamic Viewport Height) */
         html, body {
             margin: 0; padding: 0; 
-            height: 100%; /* Fallback untuk browser lama */
-            height: 100dvh; /* Sangat ampuh untuk masalah URL Bar di HP */
+            height: 100%; 
+            height: 100dvh; 
             width: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f3f4f6;
@@ -23,7 +23,7 @@
         .camera-section {
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 20%; /* DIUBAH MENJADI 20% */
+            height: 20%; 
             background-color: #000;
             display: none; 
             align-items: center;
@@ -42,7 +42,7 @@
         .info-section {
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            height: 80%; /* DIUBAH MENJADI 80% */
+            height: 80%; 
             background-color: white;
             border-radius: 25px 25px 0 0;
             padding: 25px 20px;
@@ -54,10 +54,10 @@
             z-index: 2;
         }
         
-        /* FIX LAYAR PENUH: Tambah Padding Atas agar menjauhi URL bar */
+        /* FIX LAYAR PENUH */
         .full-height {
             height: 100% !important;
-            padding-top: 70px !important; /* Mendorong konten turun sejauh 70px */
+            padding-top: 70px !important; 
             border-radius: 0px !important;
         }
 
@@ -230,7 +230,16 @@
         
         html5QrCode.start(
             { facingMode: "environment" }, 
-            { fps: 10, qrbox: { width: 180, height: 180 } }, 
+            { 
+                fps: 10, 
+                // PERBAIKAN DI SINI: Kotak dinamis agar memunculkan scanner box di area sempit
+                qrbox: function(viewfinderWidth, viewfinderHeight) {
+                    return {
+                        width: Math.min(250, viewfinderWidth * 0.8), // Maksimal lebar 250px atau 80% layar
+                        height: Math.min(100, viewfinderHeight * 0.8) // Maksimal tinggi 100px agar muat di 20%
+                    };
+                }
+            }, 
             (decodedText, decodedResult) => {
                 if (isProcessing) return;
                 const uid = decodedText.trim().toUpperCase();
