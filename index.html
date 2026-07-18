@@ -12,81 +12,116 @@
             margin: 0; padding: 0; height: 100%; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f3f4f6;
-            overflow: hidden; /* Mencegah layar tergeser/scroll berlebihan */
+            overflow: hidden;
         }
 
-        /* BAGIAN ATAS: KAMERA QR CODE (±35% Layar) */
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* BAGIAN ATAS: KAMERA QR CODE (30% Layar - Awalnya Tersembunyi) */
         .camera-section {
-            height: 35vh; 
+            height: 30vh; 
             width: 100%;
             background-color: #000;
-            position: relative;
-            display: flex;
+            display: none; /* Sembunyi di awal */
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         #reader {
             width: 100%;
             height: 100%;
         }
-        /* Menyembunyikan elemen bawaan library QR agar lebih bersih */
-        #reader__dashboard_section_csr span, #reader__dashboard_section_swaplink { display: none !important; }
-        #reader__dashboard_section_csr button {
-            padding: 8px 15px; background: #10b981; color: white; border: none; border-radius: 5px; margin-top: 10px; font-weight: bold;
-        }
 
-        /* BAGIAN BAWAH: INFORMASI & PROFIL (±65% Layar) */
+        /* BAGIAN BAHAW: PANEL UTAMA (Berubah ukuran dinamis) */
         .info-section {
-            height: 65vh;
-            width: 100%;
+            flex: 1;
             background-color: white;
             border-radius: 25px 25px 0 0;
-            margin-top: -20px; /* Efek menumpuk ke atas kamera */
-            position: relative;
-            z-index: 10;
-            padding: 25px 20px;
+            padding: 30px 20px;
             box-sizing: border-box;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
             overflow-y: auto;
             text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        /* Modifikasi border-radius jika kamera tidak aktif */
+        .full-height {
+            border-radius: 0px;
         }
 
-        /* Desain UI Dalam Info Section */
-        h2 { margin: 0 0 10px 0; color: #111827; font-size: 22px; }
-        .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 15px; }
+        /* Teks & Tipografi */
+        h2 { margin: 0 0 8px 0; color: #111827; font-size: 24px; }
+        .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 30px; }
         
-        .btn {
-            padding: 12px 20px; font-size: 16px; font-weight: bold; color: white;
-            background-color: #3b82f6; border: none; border-radius: 8px;
-            cursor: pointer; width: 100%; max-width: 300px; transition: background 0.3s;
-            margin-bottom: 10px;
+        /* ----------------------------------------- */
+        /* DESAIN MENU UTAMA (2 TOMBOL OPSI)         */
+        /* ----------------------------------------- */
+        .menu-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 320px;
+            margin: 40px auto 0 auto;
         }
-        .btn:disabled { background-color: #9ca3af; }
+        .btn-option {
+            padding: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .btn-option:active { transform: scale(0.98); }
+        .btn-nfc { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .btn-qrc { background: linear-gradient(135deg, #10b981, #047857); }
+        .btn-option span { font-size: 24px; }
+
+        /* AREA PROSES ABSENSI (Awalnya Sembunyi) */
+        .scan-view {
+            display: none;
+        }
         
         #status { font-size: 16px; font-weight: bold; margin-top: 10px; color: #4b5563; }
-        #log { font-size: 13px; color: #9ca3af; margin-top: 5px; }
+        #log { font-size: 13px; color: #9ca3af; margin-top: 5px; margin-bottom: 15px; }
 
         /* Kotak Profil Siswa */
         #profileContainer {
-            margin-top: 20px; display: none; background-color: #f0fdf4;
+            margin-top: 15px; display: none; background-color: #f0fdf4;
             padding: 15px; border-radius: 12px; border: 2px solid #bbf7d0;
             animation: fadeIn 0.4s ease-in-out; max-width: 350px; margin-left: auto; margin-right: auto;
         }
-        
         #attendanceStatusText {
-            display: none; font-size: 22px; font-weight: 900;
-            margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;
+            display: none; font-size: 20px; font-weight: 900;
+            margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;
         }
-        
         #studentPhoto {
-            width: 120px; height: 150px; object-fit: cover; border-radius: 8px;
+            width: 100px; height: 130px; object-fit: cover; border-radius: 8px;
             border: 3px solid #10b981; margin-bottom: 10px; background-color: #e5e7eb;
         }
-        .info-label { font-size: 13px; color: #6b7280; margin: 4px 0 0 0; }
-        .info-value { font-size: 18px; font-weight: bold; color: #111827; margin: 0 0 10px 0; }
+        .info-label { font-size: 12px; color: #6b7280; margin: 4px 0 0 0; }
+        .info-value { font-size: 16px; font-weight: bold; color: #111827; margin: 0 0 8px 0; }
         
+        /* Tombol Aksi */
+        .btn-back {
+            background-color: #ef4444; color: white; padding: 10px 20px;
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
+            margin-top: 15px; font-size: 14px;
+        }
         .link-admin {
-            display: block; margin-top: 25px; margin-bottom: 20px; text-decoration: none; 
+            display: block; margin-top: 30px; text-decoration: none; 
             color: #9ca3af; font-size: 14px; font-weight: bold;
         }
 
@@ -98,36 +133,51 @@
 </head>
 <body>
 
-    <div class="camera-section">
+<div class="wrapper">
+    <div id="cameraSection" class="camera-section">
         <div id="reader"></div>
     </div>
 
-    <div class="info-section">
+    <div id="infoSection" class="info-section full-height">
         <h2>Sistem E-Absensi</h2>
-        <p class="subtitle">Arahkan QR Code ke kamera atas, atau gunakan fitur NFC di bawah ini.</p>
+        <p class="subtitle" id="mainSubtitle">Silakan pilih metode absensi siswa di bawah ini untuk memulai.</p>
         
-        <button id="scanButton" class="btn">📡 Aktifkan Sensor NFC</button>
-        
-        <div id="status">Standby: Menunggu Scan QR/NFC...</div>
-        <div id="log">---</div>
-        
-        <div id="profileContainer">
-            <div id="attendanceStatusText">-</div>
-            <img id="studentPhoto" src="" alt="Foto Siswa">
-            <p class="info-label">Nama Siswa:</p>
-            <p id="studentName" class="info-value">-</p>
-            <p class="info-label">Kelas:</p>
-            <p id="studentKelas" class="info-value">-</p>
+        <div id="menuSelection" class="menu-selection">
+            <button class="btn-option btn-nfc" onclick="activateMode('NFC')">
+                <span>📟</span> KARTU RFID (NFC)
+            </button>
+            <button class="btn-option btn-qrc" onclick="activateMode('QR')">
+                <span>🔍</span> SCAN QR CODE
+            </button>
+            <a href="pengaturan.html" class="link-admin">⚙️ Pengaturan Admin</a>
         </div>
+        
+        <div id="scanView" class="scan-view">
+            <div id="status">Standby...</div>
+            <div id="log">---</div>
+            
+            <div id="profileContainer">
+                <div id="attendanceStatusText">-</div>
+                <img id="studentPhoto" src="" alt="Foto Siswa">
+                <p class="info-label">Nama Siswa:</p>
+                <p id="studentName" class="info-value">-</p>
+                <p class="info-label">Kelas:</p>
+                <p id="studentKelas" class="info-value">-</p>
+            </div>
 
-        <a href="pengaturan.html" class="link-admin">⚙️ Pengaturan Admin</a>
+            <button class="btn-back" onclick="backToMenu()">❌ Batalkan / Kembali</button>
+        </div>
     </div>
+</div>
 
 <script>
-    // ==========================================
-    // 1. DEKLARASI VARIABEL UTAMA
-    // ==========================================
-    const scanButton = document.getElementById("scanButton");
+    // DEKLARASI ELEMEN UI
+    const cameraSection = document.getElementById("cameraSection");
+    const infoSection = document.getElementById("infoSection");
+    const menuSelection = document.getElementById("menuSelection");
+    const scanView = document.getElementById("scanView");
+    const mainSubtitle = document.getElementById("mainSubtitle");
+    
     const statusDiv = document.getElementById("status");
     const logDiv = document.getElementById("log");
     const profileContainer = document.getElementById("profileContainer");
@@ -136,21 +186,120 @@
     const studentName = document.getElementById("studentName");
     const studentKelas = document.getElementById("studentKelas");
 
-    // PASTIKAN URL INI BENAR SESUAI MILIK ANDA
+    // URL APP SCRIPT ANDA
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
 
-    let ndef = null;
-    let isProcessing = false; // Sistem Anti-Dobel Scan
+    let html5QrCode = null;
+    let ctrlNfc = null;
+    let isProcessing = false; 
+    let currentMode = "";
 
     // ==========================================
-    // 2. FUNGSI INTI PEMROSESAN ABSENSI (Berlaku untuk QR & NFC)
+    // 1. MANAJEMEN PERGANTIAN MODE (NFC / QR)
+    // ==========================================
+    async function activateMode(mode) {
+        currentMode = mode;
+        menuSelection.style.display = "none";
+        scanView.style.display = "block";
+        infoSection.classList.remove("full-height"); // Mengecilkan panel bawah agar muat kamera
+
+        if (mode === "QR") {
+            mainSubtitle.innerText = "Arahkan QR Code siswa pada kotak kamera di atas.";
+            cameraSection.style.display = "flex";
+            statusDiv.innerText = "Mengaktifkan kamera...";
+            startCamera();
+        } 
+        else if (mode === "NFC") {
+            mainSubtitle.innerText = "Dekatkan kartu RFID siswa ke area sensor NFC di HP Anda.";
+            cameraSection.style.display = "none";
+            infoSection.classList.add("full-height"); // Panel kembali penuh karena kamera mati
+            statusDiv.innerText = "Mengaktifkan Sensor NFC...";
+            startNfc();
+        }
+    }
+
+    function backToMenu() {
+        // Matikan Kamera jika aktif
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().catch(err => console.log(err));
+        }
+        // Matikan session mode
+        currentMode = "";
+        isProcessing = false;
+        
+        // Reset Element Tampilan
+        cameraSection.style.display = "none";
+        infoSection.classList.add("full-height");
+        scanView.style.display = "none";
+        profileContainer.style.display = "none";
+        menuSelection.style.display = "flex";
+        mainSubtitle.innerText = "Silakan pilih metode absensi siswa di bawah ini untuk memulai.";
+    }
+
+    // ==========================================
+    // 2. ENGINE KAMERA QR CODE
+    // ==========================================
+    function startCamera() {
+        if(!html5QrCode) {
+            html5QrCode = new Html5Qrcode("reader");
+        }
+        
+        html5QrCode.start(
+            { facingMode: "environment" }, // Pakai Kamera Belakang HP
+            { fps: 10, qrbox: { width: 180, height: 140 } }, // Pembatas scan horizontal sesuai layar 30%
+            (decodedText, decodedResult) => {
+                if (isProcessing) return;
+                const uid = decodedText.trim().toUpperCase();
+                processAttendance(uid);
+            },
+            (errorMessage) => { /* Diabaikan agar konsol bersih */ }
+        ).then(() => {
+            statusDiv.innerText = "Kamera Aktif! Menunggu QR Code...";
+            statusDiv.style.color = "#4b5563";
+        }).catch(err => {
+            statusDiv.innerText = "Gagal membuka kamera: " + err;
+            statusDiv.style.color = "#dc2626";
+        });
+    }
+
+    // ==========================================
+    // 3. ENGINE RFID (WEB NFC)
+    // ==========================================
+    async function startNfc() {
+        if (!("NDEFReader" in window)) {
+            statusDiv.innerText = "HP ini tidak mendukung fitur Web NFC.";
+            statusDiv.style.color = "#dc2626";
+            return;
+        }
+        try {
+            if(!ctrlNfc) {
+                ctrlNfc = new NDEFReader();
+            }
+            await ctrlNfc.scan();
+            statusDiv.innerText = "Sensor NFC Aktif! Silakan tempel kartu...";
+            statusDiv.style.color = "#16a34a";
+
+            ctrlNfc.addEventListener("reading", ({ serialNumber }) => {
+                if (isProcessing || currentMode !== "NFC") return; 
+                const uid = serialNumber.replace(/:/g, "").toUpperCase();
+                processAttendance(uid);
+            }, { once: false });
+        } catch (error) {
+            statusDiv.innerText = "NFC Gagal diaktifkan. Nyalakan NFC di pengaturan HP.";
+            statusDiv.style.color = "#dc2626";
+            console.error(error);
+        }
+    }
+
+    // ==========================================
+    // 4. PEMROSESAN DATABASE ABSENSI KE SHEETS
     // ==========================================
     async function processAttendance(uid) {
         if (isProcessing) return; 
         isProcessing = true; 
         
-        logDiv.innerText = "Memproses ID: " + uid;
-        statusDiv.innerText = "Mencari data & mencatat absen...";
+        logDiv.innerText = "ID Terdeteksi: " + uid;
+        statusDiv.innerText = "Mencatat ke server...";
         statusDiv.style.color = "#2563eb"; 
         
         if (profileContainer.style.display === "block") {
@@ -172,118 +321,62 @@
                 } else {
                     studentPhoto.src = "https://via.placeholder.com/150x180?text=Tanpa+Foto"; 
                 }
-                studentPhoto.onerror = function() { this.src = "https://via.placeholder.com/150x180?text=Foto+Tidak+Ditemukan"; };
+                studentPhoto.onerror = function() { this.src = "https://via.placeholder.com/150x180?text=Foto+Kosong"; };
                 
                 profileContainer.style.display = "block";
 
-                // KONDISI 1: BERHASIL ABSEN BARU
                 if (data.status === "success") {
                     attendanceStatusText.style.display = "none"; 
-                    statusDiv.innerText = "Status: " + data.message;
+                    statusDiv.innerText = "Sukses: " + data.message;
                     statusDiv.style.color = "#16a34a"; 
-                    
                     profileContainer.style.backgroundColor = "#f0fdf4";
                     profileContainer.style.borderColor = "#bbf7d0";
-                    studentPhoto.style.borderColor = "#10b981";
-                } 
-                // KONDISI 2: SUDAH ABSEN SEBELUMNYA / LIBUR
-                else {
+                } else {
                     attendanceStatusText.innerText = data.statusAbsen; 
                     attendanceStatusText.style.display = "block"; 
                     
                     let statusCek = data.statusAbsen.toUpperCase();
                     if (statusCek.includes("MASUK")) { attendanceStatusText.style.color = "#16a34a"; } 
                     else if (statusCek.includes("TERLAMBAT")) { attendanceStatusText.style.color = "#dc2626"; } 
-                    else if (statusCek.includes("PULANG") || statusCek.includes("LIBUR")) { attendanceStatusText.style.color = "#2563eb"; } 
-                    else { attendanceStatusText.style.color = "#d97706"; }
+                    else { attendanceStatusText.style.color = "#2563eb"; }
                     
-                    statusDiv.innerText = "Peringatan: " + data.message;
+                    statusDiv.innerText = "Info: " + data.message;
                     statusDiv.style.color = "#d97706";
-                    
                     profileContainer.style.backgroundColor = "#fffbeb"; 
                     profileContainer.style.borderColor = "#fef3c7";
-                    studentPhoto.style.borderColor = "#d97706";
                 }
             } else {
-                // KONDISI 3: KARTU / QR TIDAK DIKENAL
-                statusDiv.innerText = "Status: " + data.message;
+                statusDiv.innerText = "Gagal: " + data.message;
                 statusDiv.style.color = "#dc2626"; 
-                
                 attendanceStatusText.innerText = "DITOLAK";
                 attendanceStatusText.style.display = "block";
                 attendanceStatusText.style.color = "#dc2626"; 
-                
-                studentName.innerText = "DATA TIDAK DIKENAL";
-                studentKelas.innerText = "Belum Terdaftar";
+                studentName.innerText = "KARTU/QR TIDAK TERDAFTAR";
+                studentKelas.innerText = "Siswa Asing";
                 studentPhoto.src = "https://via.placeholder.com/150x180?text=Error";
-                
                 profileContainer.style.display = "block";
                 profileContainer.style.backgroundColor = "#fef2f2";
                 profileContainer.style.borderColor = "#fecaca";
-                studentPhoto.style.borderColor = "#dc2626";
             }
         } catch (err) {
             profileContainer.style.opacity = "1";
-            statusDiv.innerText = "Status: Server tidak merespon.";
+            statusDiv.innerText = "Koneksi Terputus / Server Sibuk.";
             statusDiv.style.color = "#dc2626";
             logDiv.innerText = err.message;
         }
 
-        // Jeda Cooldown 3 Detik sebelum bisa scan orang lain
+        // Jeda Penguncian (Cooldown) 3 Detik agar tidak mendobel kirim
         setTimeout(() => {
-            statusDiv.innerText = "Standby: Menunggu Scan QR/NFC berikutnya...";
-            if(statusDiv.style.color !== "rgb(220, 38, 38)") { 
+            if (currentMode === "QR") {
+                statusDiv.innerText = "Kamera Aktif! Menunggu QR Code berikutnya...";
                 statusDiv.style.color = "#4b5563";
+            } else if (currentMode === "NFC") {
+                statusDiv.innerText = "Sensor NFC Aktif! Menunggu kartu berikutnya...";
+                statusDiv.style.color = "#16a34a";
             }
             isProcessing = false; 
         }, 3000);
     }
-
-    // ==========================================
-    // 3. INISIALISASI KAMERA QR CODE
-    // ==========================================
-    function onScanSuccess(decodedText, decodedResult) {
-        // Jika sedang memproses data siswa sebelumnya, abaikan scan baru
-        if (isProcessing) return;
-        
-        // Membersihkan spasi barangkali ada salah pembuatan QR
-        const uid = decodedText.trim().toUpperCase();
-        processAttendance(uid);
-    }
-
-    // Menjalankan Kamera Belakang secara otomatis saat web dibuka
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", { fps: 10, qrbox: { width: 200, height: 200 } }, false);
-    
-    html5QrcodeScanner.render(onScanSuccess);
-
-    // ==========================================
-    // 4. INISIALISASI PEMINDAI NFC
-    // ==========================================
-    scanButton.addEventListener("click", async () => {
-        if (!("NDEFReader" in window)) {
-            alert("Browser HP Anda tidak mendukung Web NFC.");
-            return;
-        }
-        try {
-            ndef = new NDEFReader();
-            await ndef.scan();
-            scanButton.disabled = true; 
-            scanButton.innerText = "✅ Sensor NFC Aktif";
-            scanButton.style.backgroundColor = "#10b981";
-
-            ndef.addEventListener("reading", async ({ serialNumber }) => {
-                if (isProcessing) return; 
-                // Format UID NFC agar sesuai dengan teks QR Code (Tanpa titik dua)
-                const uid = serialNumber.replace(/:/g, "").toUpperCase();
-                processAttendance(uid);
-            });
-        } catch (error) {
-            alert("Gagal mengaktifkan sensor NFC. Pastikan NFC HP menyala.");
-            console.error(error);
-        }
-    });
-
 </script>
 
 </body>
