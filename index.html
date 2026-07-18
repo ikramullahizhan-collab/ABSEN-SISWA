@@ -225,12 +225,21 @@
 
     function startCamera() {
         if(!html5QrCode) {
-            html5QrCode = new Html5Qrcode("reader");
+            // TRIK 1: Fokus HANYA pada QR Code agar pemrosesan secepat kilat
+            html5QrCode = new Html5Qrcode("reader", { 
+                formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ] 
+            });
         }
         
         html5QrCode.start(
             { facingMode: "environment" }, 
-            { fps: 10, qrbox: { width: 180, height: 180 } }, 
+            { 
+                // TRIK 2: Naikkan FPS dari 10 ke 30 agar lebih sensitif
+                fps: 30, 
+                qrbox: { width: 180, height: 180 },
+                // Menonaktifkan pencarian terbalik untuk menghemat memori
+                disableFlip: true 
+            }, 
             (decodedText, decodedResult) => {
                 if (isProcessing) return;
                 const uid = decodedText.trim().toUpperCase();
