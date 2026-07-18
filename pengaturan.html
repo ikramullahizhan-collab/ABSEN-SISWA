@@ -18,15 +18,45 @@
             background: white;
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             text-align: left;
             margin-bottom: 20px;
         }
-        h2 { text-align: center; margin-bottom: 25px; color: #111827; }
-        h3 { color: #1f2937; margin-bottom: 15px; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; }
+        h2 { text-align: center; margin-bottom: 15px; color: #111827; font-size: 24px; }
         
+        /* --------------------------------------------------- */
+        /* DESAIN MENU TAB */
+        /* --------------------------------------------------- */
+        .tab-menu {
+            display: flex;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 25px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: bold;
+            color: #9ca3af;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover { color: #10b981; }
+        .tab-btn.active {
+            color: #10b981;
+            border-bottom: 3px solid #10b981;
+        }
+        .tab-content { 
+            display: none; 
+            animation: fadeIn 0.4s; 
+        }
+        
+        /* Form & Input Styles */
         .form-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; color: #4b5563; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #4b5563; font-size: 14px;}
         input[type="time"], input[type="date"], input[type="text"] {
             width: 100%;
             padding: 12px;
@@ -59,112 +89,143 @@
         input:checked + .slider:before { transform: translateX(26px); }
         .clearfix::after { content: ""; clear: both; display: table; }
 
+        /* Buttons */
         .btn-submit {
             padding: 14px; font-size: 16px; font-weight: bold; color: white;
             background-color: #10b981; border: none; border-radius: 8px;
-            cursor: pointer; width: 100%; transition: background 0.3s; margin-top: 10px;
+            cursor: pointer; width: 100%; transition: background 0.3s; margin-top: 5px;
         }
         .btn-submit:hover { background-color: #059669; }
         .btn-blue { background-color: #3b82f6; }
         .btn-blue:hover { background-color: #2563eb; }
         
         .btn-back {
-            display: block; text-align: center; margin-top: 20px;
-            text-decoration: none; color: #4b5563; font-size: 14px; font-weight: bold;
+            display: block; text-align: center; margin-top: 25px;
+            text-decoration: none; color: #6b7280; font-size: 14px; font-weight: bold;
         }
+        .btn-back:hover { color: #111827; }
         
         /* Tabel Libur */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th, td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
-        th { background-color: #f3f4f6; color: #374151; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+        th { background-color: #f3f4f6; color: #374151; font-weight: bold; }
         
         .message-box {
-            margin-top: 15px; padding: 10px; border-radius: 6px;
-            display: none; text-align: center; font-weight: bold;
+            margin-top: 15px; padding: 12px; border-radius: 8px;
+            display: none; text-align: center; font-weight: bold; font-size: 14px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>⚙️ Pengaturan Dasar</h2>
+    <h2>⚙️ Panel Admin</h2>
     
-    <form id="configForm">
-        <div class="form-group">
-            <label>Batas Jam Masuk Sekolah:</label>
-            <input type="time" id="jamMasuk" required>
-        </div>
-        
-        <div class="form-group">
-            <label>Jam Pulang Sekolah:</label>
-            <input type="time" id="jamPulang" required>
-        </div>
+    <div class="tab-menu">
+        <button class="tab-btn active" onclick="openTab(event, 'tabAbsen')">Jam Absen</button>
+        <button class="tab-btn" onclick="openTab(event, 'tabLibur')">Hari Libur</button>
+    </div>
 
-        <div class="form-group">
-            <label>Jadwal Hari Libur Akhir Pekan:</label>
-            <div class="toggle-wrapper clearfix">
-                <div class="toggle-header">
-                    <span style="font-size: 15px; font-weight: 500;">Sabtu & Minggu</span>
-                    <span id="toggleText" class="toggle-status" style="color: #10b981;">AKTIF (Libur)</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="liburWeekendToggle">
-                    <span class="slider round"></span>
-                </label>
+    <div id="tabAbsen" class="tab-content" style="display: block;">
+        <form id="configForm">
+            <div class="form-group">
+                <label>Batas Jam Masuk Sekolah:</label>
+                <input type="time" id="jamMasuk" required>
             </div>
-        </div>
-        
-        <button type="submit" class="btn-submit">Simpan Pengaturan</button>
-    </form>
-    <div id="msgConfig" class="message-box"></div>
-</div>
+            
+            <div class="form-group">
+                <label>Jam Pulang Sekolah:</label>
+                <input type="time" id="jamPulang" required>
+            </div>
 
-<div class="container">
-    <h3>📅 Tambah Hari Libur (Tanggal Merah)</h3>
+            <div class="form-group">
+                <label>Jadwal Libur Akhir Pekan:</label>
+                <div class="toggle-wrapper clearfix">
+                    <div class="toggle-header">
+                        <span style="font-size: 15px; font-weight: 500;">Sabtu & Minggu</span>
+                        <span id="toggleText" class="toggle-status" style="color: #10b981;">AKTIF (Libur)</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="liburWeekendToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit">Simpan Pengaturan</button>
+        </form>
+        <div id="msgConfig" class="message-box"></div>
+    </div>
+
+    <div id="tabLibur" class="tab-content">
+        <form id="liburForm">
+            <div class="form-group">
+                <label>Pilih Tanggal Merah:</label>
+                <input type="date" id="tglLibur" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Keterangan Libur:</label>
+                <input type="text" id="ketLibur" placeholder="Contoh: Maulid Nabi / Rapat Guru" required>
+            </div>
+            
+            <button type="submit" class="btn-submit btn-blue">+ Tambah Libur</button>
+        </form>
+        <div id="msgLibur" class="message-box"></div>
+
+        <h3 style="color: #1f2937; margin-top: 30px; font-size: 16px; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">Daftar Hari Libur Terdaftar</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Keterangan</th>
+                </tr>
+            </thead>
+            <tbody id="tabelLibur">
+                <tr><td colspan="2" style="text-align:center;">Memuat data...</td></tr>
+            </tbody>
+        </table>
+        <small style="color: #9ca3af; display: block; margin-top: 10px; font-style: italic;">*Untuk menghapus libur, silakan hapus barisnya langsung melalui Google Sheets Anda.</small>
+    </div>
     
-    <form id="liburForm">
-        <div class="form-group">
-            <label>Pilih Tanggal:</label>
-            <input type="date" id="tglLibur" required>
-        </div>
-        
-        <div class="form-group">
-            <label>Keterangan Libur:</label>
-            <input type="text" id="ketLibur" placeholder="Contoh: Maulid Nabi / Rapat Guru" required>
-        </div>
-        
-        <button type="submit" class="btn-submit btn-blue">+ Tambahkan Ke Kalender</button>
-    </form>
-    <div id="msgLibur" class="message-box"></div>
-
-    <h3 style="margin-top: 30px;">Daftar Hari Libur Terdaftar</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Tanggal</th>
-                <th>Keterangan</th>
-            </tr>
-        </thead>
-        <tbody id="tabelLibur">
-            <tr><td colspan="2" style="text-align:center;">Memuat data...</td></tr>
-        </tbody>
-    </table>
-    <small style="color: #9ca3af; display: block; margin-top: 10px;">*Untuk menghapus libur yang salah input, silakan hapus barisnya langsung melalui Google Sheets.</small>
-
-    <a href="index.html" class="btn-back">⬅️ KEMBALI KE MENU ABSENSI</a>
+    <a href="index.html" class="btn-back">⬅️ KEMBALI KE MESIN ABSENSI</a>
 </div>
 
 <script>
+    // FUNGSI UNTUK MENGGANTI TAB
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        // Sembunyikan semua konten tab
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        // Hapus class 'active' dari semua tombol
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        // Tampilkan tab yang dipilih dan tambahkan warna hijau (active)
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    // VARIABEL FORM & DATA
     const configForm = document.getElementById("configForm");
     const liburForm = document.getElementById("liburForm");
     const toggleInput = document.getElementById("liburWeekendToggle");
     const toggleText = document.getElementById("toggleText");
     const tabelLibur = document.getElementById("tabelLibur");
     
-    // GANTI DENGAN URL WEB APP ANDA YANG BARU DI-DEPLOY
+    // GANTI DENGAN URL WEB APP ANDA
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
 
-    // Efek Teks Sakelar
+    // Efek Teks Sakelar Akhir Pekan
     toggleInput.addEventListener("change", function() {
         if (this.checked) {
             toggleText.innerText = "AKTIF (Sistem Libur)";
@@ -175,7 +236,7 @@
         }
     });
 
-    // 1. Muat Data Pengaturan & Tabel Libur
+    // 1. Muat Data Pengaturan & Tabel Libur dari Sheets
     async function fetchData() {
         try {
             // Ambil Config Jam & Toggle
@@ -200,16 +261,16 @@
             const resLibur = await fetch(`${APPS_SCRIPT_URL}?action=get_libur`);
             const dataLibur = await resLibur.json();
             
-            tabelLibur.innerHTML = ""; // Bersihkan tabel
+            tabelLibur.innerHTML = ""; 
             if (dataLibur.status === "success" && dataLibur.data.length > 0) {
                 dataLibur.data.forEach(item => {
                     tabelLibur.innerHTML += `<tr>
-                        <td style="font-weight:bold;">${item.tanggal}</td>
-                        <td>${item.keterangan}</td>
+                        <td style="font-weight:bold; color:#1f2937;">${item.tanggal}</td>
+                        <td style="color:#4b5563;">${item.keterangan}</td>
                     </tr>`;
                 });
             } else {
-                tabelLibur.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#9ca3af;">Belum ada hari libur terdaftar</td></tr>`;
+                tabelLibur.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#9ca3af; padding: 20px;">Belum ada hari libur terdaftar</td></tr>`;
             }
 
         } catch (error) {
@@ -217,7 +278,7 @@
         }
     }
 
-    // 2. Simpan Pengaturan Dasar (Panel Atas)
+    // 2. Simpan Pengaturan Dasar (TAB 1)
     configForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const msg = document.getElementById("msgConfig");
@@ -242,7 +303,7 @@
         }
     });
 
-    // 3. Tambah Hari Libur Baru (Panel Bawah)
+    // 3. Tambah Hari Libur Baru (TAB 2)
     liburForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const msg = document.getElementById("msgLibur");
@@ -276,6 +337,7 @@
         }
     });
 
+    // Fungsi notifikasi pop-up
     function showMessage(element, text, colorType) {
         element.style.display = "block";
         element.innerText = text;
@@ -285,7 +347,7 @@
         setTimeout(() => { element.style.display = "none"; }, 4000);
     }
 
-    // Jalankan saat load
+    // Muat data saat halaman terbuka
     fetchData();
 </script>
 
