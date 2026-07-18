@@ -19,11 +19,11 @@
             position: relative;
         }
 
-        /* BAGIAN ATAS: KAMERA QR CODE (20% Layar) */
+        /* BAGIAN ATAS: KAMERA QR CODE (Dikembalikan ke 25%) */
         .camera-section {
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 20%; 
+            height: 25%; /* KEMBALI KE 25% */
             background-color: #000;
             display: none; 
             align-items: center;
@@ -31,20 +31,20 @@
             overflow: hidden; 
             z-index: 1;
         }
-        #reader { width: 100%; height: 100%; position: relative; }
+        #reader { width: 100%; height: 100%; }
         
-        /* PENTING: Ubah menjadi contain agar kamera tidak zoom-in memotong QR Code */
+        /* KEMBALI MENGGUNAKAN ZOOM (cover) */
         #reader video {
-            object-fit: contain !important; 
+            object-fit: cover !important; 
             width: 100% !important; 
             height: 100% !important;
         }
 
-        /* BAGIAN BAWAH: PANEL UTAMA (80% Layar) */
+        /* BAGIAN BAWAH: PANEL UTAMA (Dikembalikan ke 75%) */
         .info-section {
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            height: 80%; 
+            height: 75%; /* KEMBALI KE 75% */
             background-color: white;
             border-radius: 25px 25px 0 0;
             padding: 25px 20px;
@@ -191,7 +191,7 @@
         if (mode === "QR") {
             infoSection.classList.remove("full-height"); 
             cameraSection.style.display = "flex"; 
-            mainSubtitle.innerText = "Arahkan QR Code siswa agak jauh agar pas dalam kotak.";
+            mainSubtitle.innerText = "Arahkan QR Code siswa pada kotak kamera di atas.";
             statusDiv.innerText = "Mengaktifkan kamera...";
             startCamera();
         } 
@@ -232,15 +232,9 @@
         html5QrCode.start(
             { facingMode: "environment" }, 
             { 
-                fps: 10,
-                // MEMBUAT KOTAK PERSEGI SEMPURNA YANG OTOMATIS MENYESUAIKAN TINGGI 20% LAYAR
-                qrbox: function(viewfinderWidth, viewfinderHeight) {
-                    // Ambil nilai terkecil antara tinggi dan lebar layar yang tersedia (pasti tingginya)
-                    let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
-                    // Buat kotak sebesar 90% dari ruang tinggi yang tersedia
-                    let size = Math.floor(minEdgeSize * 0.90); 
-                    return { width: size, height: size };
-                }
+                fps: 10, 
+                // KEMBALI KE SCRIPT SCANNER NORMAL YANG BERFUNGSI BAIK
+                qrbox: { width: 160, height: 160 } 
             }, 
             (decodedText, decodedResult) => {
                 if (isProcessing) return;
@@ -249,7 +243,7 @@
             },
             (errorMessage) => { }
         ).then(() => {
-            statusDiv.innerText = "Kamera Aktif! Arahkan QR Code...";
+            statusDiv.innerText = "Kamera Aktif! Menunggu QR Code...";
             statusDiv.style.color = "#4b5563";
         }).catch(err => {
             statusDiv.innerText = "Gagal membuka kamera.";
