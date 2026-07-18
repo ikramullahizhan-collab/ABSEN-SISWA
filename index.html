@@ -225,19 +225,17 @@
 
     function startCamera() {
         if(!html5QrCode) {
-            // Trik 1: Kunci mesin HANYA untuk membaca QR Code
-            html5QrCode = new Html5Qrcode("reader", { 
-                formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ] 
-            });
+            // Kembali ke inisialisasi awal yang paling stabil
+            html5QrCode = new Html5Qrcode("reader");
         }
         
         html5QrCode.start(
             { facingMode: "environment" }, 
             { 
-                // Trik 2: Kecepatan tangkap 30 frame per detik
+                // TRIK KECEPATAN: Kita naikkan kecepatan tangkap menjadi 30 fps
                 fps: 30, 
-                // KEMBALIKAN KOTAK: Tapi ukurannya diperbesar agar lebih mudah membidik
-                qrbox: { width: 250, height: 250 } 
+                // KOTAK AMAN: Kita kembalikan ke 180 agar muat di area 25% layar
+                qrbox: { width: 180, height: 180 } 
             }, 
             (decodedText, decodedResult) => {
                 if (isProcessing) return;
@@ -245,7 +243,7 @@
                 processAttendance(uid);
             },
             (errorMessage) => { 
-                // Error scanning frame wajar terjadi, biarkan kosong
+                // Biarkan kosong
             }
         ).then(() => {
             statusDiv.innerText = "Kamera Aktif! Menunggu QR Code...";
