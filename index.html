@@ -225,24 +225,19 @@
 
     function startCamera() {
         if(!html5QrCode) {
+            // Fokus HANYA pada QR Code agar pemrosesan secepat kilat
             html5QrCode = new Html5Qrcode("reader", { 
                 formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ] 
             });
         }
         
-        // JURUS 1: Memaksa browser meminta fitur fokus otomatis terus-menerus
-        const cameraConstraints = {
-            facingMode: "environment",
-            advanced: [{ focusMode: "continuous" }]
-        };
-
+        // Kembali ke pengaturan kamera bawaan yang AMAN untuk semua HP
         html5QrCode.start(
-            cameraConstraints, 
+            { facingMode: "environment" }, 
             { 
+                // Tetap 30 Frame per Detik agar sangat sensitif
                 fps: 30, 
-                // JURUS 2: qrbox DIHAPUS. 
-                // Akibatnya, scanner akan membaca SELURUH area video (seperti QRIS).
-                // Sangat cepat karena siswa tidak perlu mencocokkan QR ke dalam kotak.
+                // qrbox TIDAK DITULIS: Agar area scan membaca seluruh layar (Bebas Target)
                 disableFlip: true 
             }, 
             (decodedText, decodedResult) => {
@@ -251,7 +246,7 @@
                 processAttendance(uid);
             },
             (errorMessage) => { 
-                // Error scanning frame wajar terjadi, biarkan kosong agar tidak memberatkan browser
+                // Biarkan kosong
             }
         ).then(() => {
             statusDiv.innerText = "Kamera Aktif! Arahkan QR Code...";
