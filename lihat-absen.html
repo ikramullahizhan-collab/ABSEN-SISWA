@@ -235,33 +235,37 @@
                 resData.data.forEach(siswa => {
                     const row = document.createElement("tr");
 
-                    // Kolom Nama
                     const cellNama = document.createElement("td");
                     cellNama.innerText = siswa.nama;
                     row.appendChild(cellNama);
 
-                    // Kolom Jam Absen
+                    // Jam sekarang bisa menampilkan range (07:00 - 15:00)
                     const cellJam = document.createElement("td");
                     cellJam.innerText = siswa.jam || "--:--";
                     row.appendChild(cellJam);
 
-                    // Kolom Status Badge
                     const cellStatus = document.createElement("td");
                     const badge = document.createElement("span");
                     badge.className = "badge";
                     
                     let statusCek = (siswa.statusAbsen || "").toUpperCase();
-                    if (statusCek.includes("TERLAMBAT")) {
-                        badge.classList.add("badge-terlambat");
-                        badge.innerText = "Terlambat";
+                    
+                    // PENENTUAN WARNA BADGE SESUAI STATUS BARU
+                    if (statusCek.includes("BOLOS") || statusCek.includes("ALFA") || statusCek.includes("BELUM")) {
+                        badge.classList.add("badge-terlambat"); // Tampilan warna merah
+                        badge.innerText = siswa.statusAbsen;
+                        // Tidak menambah counter hadir/terlambat
+                    } 
+                    else if (statusCek.includes("TERLAMBAT")) {
+                        badge.classList.add("badge-terlambat"); // Tampilan warna merah (atau bisa Anda custom kuning)
+                        badge.innerText = siswa.statusAbsen;
                         terlambat++;
-                    } else if (statusCek.includes("MASUK") || statusCek !== "") {
-                        badge.classList.add("badge-masuk");
-                        badge.innerText = "Hadir";
+                        hadir++; // Masih dihitung hadir di sekolah
+                    } 
+                    else { 
+                        badge.classList.add("badge-masuk"); // Tampilan warna hijau (Normal/Masuk)
+                        badge.innerText = siswa.statusAbsen;
                         hadir++;
-                    } else {
-                        badge.classList.add("badge-terlambat");
-                        badge.innerText = "Alfa / Belum Absen";
                     }
 
                     cellStatus.appendChild(badge);
