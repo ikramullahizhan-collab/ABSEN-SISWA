@@ -57,8 +57,33 @@
         /* FIX LAYAR PENUH: Tambah Padding Atas agar menjauhi URL bar */
         .full-height {
             height: 100% !important;
-            padding-top: 70px !important; /* Mendorong konten turun sejauh 70px */
+            padding-top: 30px !important; /* Disesuaikan sedikit agar proporsional dengan Jam */
             border-radius: 0px !important;
+        }
+
+        /* --- CSS BARU: Desain Wadah Jam Digital --- */
+        #clockContainer {
+            text-align: center;
+            margin: 0 auto 20px auto;
+            padding: 12px;
+            background-color: #f8fafc;
+            border-radius: 14px;
+            max-width: 340px;
+            border: 1px solid #e2e8f0;
+        }
+        #liveClock {
+            font-size: 34px; /* Angka jam tegas */
+            font-weight: 800;
+            color: #0f172a;
+            font-family: 'Courier New', Courier, monospace; /* Monospace agar angka tidak goyang saat berdetik */
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+        #liveDate {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 600;
+            margin-top: 6px;
         }
 
         /* Teks & Tipografi */
@@ -87,33 +112,33 @@
         #status { font-size: 16px; font-weight: bold; margin-top: 5px; color: #4b5563; }
         #log { font-size: 12px; color: #dc2626; margin-top: 5px; margin-bottom: 10px; font-style: italic; }
 
-       /* Kotak Profil Siswa */
+        /* Kotak Profil Siswa */
         #profileContainer {
             margin-top: 5px; display: none; background-color: #f0fdf4;
-            padding: 20px; /* Area dalam diperluas */
+            padding: 20px; 
             border-radius: 12px; border: 2px solid #bbf7d0;
             animation: fadeIn 0.4s ease-in-out; 
-            max-width: 380px; /* Kotak sedikit diperlebar agar proporsional */
+            max-width: 380px; 
             margin-left: auto; margin-right: auto;
         }
         #attendanceStatusText {
             display: none; 
-            font-size: 24px; /* Ukuran teks status (MASUK/DITOLAK) diperbesar */
+            font-size: 24px; 
             font-weight: 900;
             margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;
         }
         #studentPhoto {
-            width: 140px; /* Lebar foto diperbesar dari 100px */
-            height: 182px; /* Tinggi foto diperbesar dari 130px */
+            width: 140px; 
+            height: 182px; 
             object-fit: cover; border-radius: 10px;
             border: 4px solid #10b981; margin-bottom: 12px; background-color: #e5e7eb;
         }
         .info-label { 
-            font-size: 14px; /* Teks label (Nama/Kelas) diperbesar */
+            font-size: 14px; 
             color: #6b7280; margin: 6px 0 0 0; 
         }
         .info-value { 
-            font-size: 22px; /* Nama siswa & Kelas diperbesar dari 16px ke 22px */
+            font-size: 22px; 
             font-weight: bold; color: #111827; margin: 0 0 10px 0; 
         }
         
@@ -141,6 +166,11 @@
     </div>
 
     <div id="infoSection" class="info-section full-height">
+        <div id="clockContainer">
+            <div id="liveClock">00:00:00 WIB</div>
+            <div id="liveDate">Memuat Tanggal...</div>
+        </div>
+
         <h2>Sistem E-Absensi</h2>
         <p class="subtitle" id="mainSubtitle">Silakan pilih metode absensi siswa di bawah ini untuk memulai.</p>
         
@@ -187,11 +217,10 @@
     const studentKelas = document.getElementById("studentKelas");
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
-    // --- TAMBAHKAN KODE INI DI BAWAHNYA ---
+    
     const audioSukses = new Audio("sukses.mp3");
     const audioGagal = new Audio("gagal.mp3");
     
-    // Memaksa browser memuat suara ke memori sejak awal
     audioSukses.load();
     audioGagal.load();
     
@@ -245,16 +274,13 @@
 
     function startCamera() {
         if(!html5QrCode) {
-            // Kembali ke inisialisasi awal yang paling stabil
             html5QrCode = new Html5Qrcode("reader");
         }
         
         html5QrCode.start(
             { facingMode: "environment" }, 
             { 
-                // TRIK KECEPATAN: Kita naikkan kecepatan tangkap menjadi 30 fps
                 fps: 15, 
-                // KOTAK AMAN: Kita kembalikan ke 180 agar muat di area 25% layar
                 qrbox: { width: 180, height: 180 } 
             }, 
             (decodedText, decodedResult) => {
@@ -339,9 +365,7 @@
                 profileContainer.style.display = "block";
 
                 if (data.status === "success") {
-                    // SUARA: Bunyi "Ting!" karena absen baru berhasil dicatat
                     audioSukses.play().catch(e => console.log("Audio diblokir browser"));
-
                     attendanceStatusText.style.display = "none"; 
                     statusDiv.innerText = "Sukses: " + data.message;
                     statusDiv.style.color = "#16a34a"; 
@@ -353,17 +377,14 @@
                     
                     let statusCek = data.statusAbsen.toUpperCase();
                     if (statusCek.includes("MASUK")) { 
-                        // SUARA: Bunyi "Ting!" jika keterangannya sudah absen masuk tepat waktu
                         audioSukses.play().catch(e => console.log("Audio diblokir browser"));
                         attendanceStatusText.style.color = "#16a34a"; 
                     } 
                     else if (statusCek.includes("TERLAMBAT")) { 
-                        // SUARA: Bunyi "Buzzer" karena statusnya Terlambat
                         audioGagal.play().catch(e => console.log("Audio diblokir browser"));
                         attendanceStatusText.style.color = "#dc2626"; 
                     } 
                     else { 
-                        // SUARA: Cadangan bunyi sukses jika statusnya di luar kategori di atas
                         audioSukses.play().catch(e => console.log("Audio diblokir browser"));
                         attendanceStatusText.style.color = "#2563eb"; 
                     }
@@ -374,9 +395,7 @@
                     profileContainer.style.borderColor = "#fef3c7";
                 }
             } else {
-                // SUARA: Bunyi "Buzzer" karena QR/Kartu ditolak sistem
                 audioGagal.play().catch(e => console.log("Audio diblokir browser"));
-
                 statusDiv.innerText = "Ditolak: " + data.message;
                 statusDiv.style.color = "#dc2626"; 
                 attendanceStatusText.innerText = "DITOLAK";
@@ -390,9 +409,7 @@
                 profileContainer.style.borderColor = "#fecaca";
             }
         } catch (err) {
-            // SUARA: Bunyi "Buzzer" karena koneksi internet putus saat memproses data
             audioGagal.play().catch(e => console.log("Audio diblokir browser"));
-
             profileContainer.style.opacity = "1";
             statusDiv.innerText = "Koneksi Terputus / Server Sibuk.";
             statusDiv.style.color = "#dc2626";
@@ -410,6 +427,38 @@
             isProcessing = false; 
         }, 3000);
     }
+
+    // --- JAVASCRIPT BARU: Sistem Detak Jam Digital Real-Time ---
+    function startLiveClock() {
+        const clockElement = document.getElementById("liveClock");
+        const dateElement = document.getElementById("liveDate");
+
+        setInterval(() => {
+            const now = new Date();
+
+            // Format Waktu Indonesia (24 Jam) -> HH:MM:SS
+            const formatTime = now.toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false
+            });
+
+            // Format Tanggal Indonesia -> Hari, DD Bulan YYYY
+            const formatDate = now.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+
+            clockElement.innerText = formatTime + " WIB";
+            dateElement.innerText = formatDate;
+        }, 1000);
+    }
+
+    // Jalankan mesin jam setelah seluruh dokumen HTML selesai dimuat
+    window.addEventListener("DOMContentLoaded", startLiveClock);
 </script>
 
 </body>
