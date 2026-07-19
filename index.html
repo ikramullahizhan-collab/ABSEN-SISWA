@@ -91,7 +91,7 @@
 
         .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 25px; }
         
-        /* MENU UTAMA */
+       /* MENU UTAMA */
         .menu-selection {
             display: flex; flex-direction: column; gap: 15px;
             max-width: 320px; margin: 30px auto 0 auto;
@@ -107,6 +107,32 @@
         .btn-qrc { background: linear-gradient(135deg, #10b981, #047857); }
         .btn-option span { font-size: 24px; }
 
+        /* GRUP TOMBOL BAWAH (REKAP & SETING) */
+        .action-group {
+            display: flex; 
+            gap: 15px; 
+            margin-top: 5px; 
+        }
+        .btn-half {
+            flex: 1; /* Membagi ukuran sama rata kiri dan kanan */
+            padding: 15px 10px; 
+            font-size: 15px; 
+            font-weight: bold; 
+            color: white;
+            text-decoration: none; 
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            transition: transform 0.2s;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 8px;
+        }
+        .btn-half:active { transform: scale(0.98); }
+        .btn-rekap { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .btn-seting { background: linear-gradient(135deg, #64748b, #475569); }
+        
+        /* (HAPUS class .link-admin karena sudah tidak dipakai dan digantikan .btn-seting di atas) */
         /* AREA PROSES ABSENSI */
         .scan-view { display: none; }
         
@@ -149,10 +175,6 @@
             border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
             margin-top: 15px; font-size: 15px;
         }
-        .link-admin {
-            display: block; margin-top: 30px; text-decoration: none; 
-            color: #9ca3af; font-size: 14px; font-weight: bold;
-        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -184,7 +206,14 @@
             <button class="btn-option btn-qrc" onclick="activateMode('QR')">
                 <span>🔍</span> QR CODE
             </button>
-            <a href="pengaturan.html" class="link-admin">⚙️ Seting</a>
+           <div class="action-group">
+                <a href="lihat-absen.html" class="btn-half btn-rekap">
+                    📋 Rekap
+                </a>
+                <a href="pengaturan.html" class="btn-half btn-seting">
+                    ⚙️ Seting
+                </a>
+            </div>
         </div>
         
         <div id="scanView" class="scan-view">
