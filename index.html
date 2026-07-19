@@ -187,7 +187,14 @@
     const studentKelas = document.getElementById("studentKelas");
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
-
+    // --- TAMBAHKAN KODE INI DI BAWAHNYA ---
+    const audioSukses = new Audio("sukses.mp3");
+    const audioGagal = new Audio("gagal.mp3");
+    
+    // Memaksa browser memuat suara ke memori sejak awal
+    audioSukses.load();
+    audioGagal.load();
+    
     let html5QrCode = null;
     let nfcAbortController = null; 
     let isProcessing = false; 
@@ -332,6 +339,9 @@
                 profileContainer.style.display = "block";
 
                 if (data.status === "success") {
+                    // SUARA: Bunyi "Ting!" karena absen baru berhasil dicatat
+                    audioSukses.play().catch(e => console.log("Audio diblokir browser"));
+
                     attendanceStatusText.style.display = "none"; 
                     statusDiv.innerText = "Sukses: " + data.message;
                     statusDiv.style.color = "#16a34a"; 
@@ -342,9 +352,21 @@
                     attendanceStatusText.style.display = "block"; 
                     
                     let statusCek = data.statusAbsen.toUpperCase();
-                    if (statusCek.includes("MASUK")) { attendanceStatusText.style.color = "#16a34a"; } 
-                    else if (statusCek.includes("TERLAMBAT")) { attendanceStatusText.style.color = "#dc2626"; } 
-                    else { attendanceStatusText.style.color = "#2563eb"; }
+                    if (statusCek.includes("MASUK")) { 
+                        // SUARA: Bunyi "Ting!" jika keterangannya sudah absen masuk tepat waktu
+                        audioSukses.play().catch(e => console.log("Audio diblokir browser"));
+                        attendanceStatusText.style.color = "#16a34a"; 
+                    } 
+                    else if (statusCek.includes("TERLAMBAT")) { 
+                        // SUARA: Bunyi "Buzzer" karena statusnya Terlambat
+                        audioGagal.play().catch(e => console.log("Audio diblokir browser"));
+                        attendanceStatusText.style.color = "#dc2626"; 
+                    } 
+                    else { 
+                        // SUARA: Cadangan bunyi sukses jika statusnya di luar kategori di atas
+                        audioSukses.play().catch(e => console.log("Audio diblokir browser"));
+                        attendanceStatusText.style.color = "#2563eb"; 
+                    }
                     
                     statusDiv.innerText = "Info: " + data.message;
                     statusDiv.style.color = "#d97706";
@@ -352,6 +374,9 @@
                     profileContainer.style.borderColor = "#fef3c7";
                 }
             } else {
+                // SUARA: Bunyi "Buzzer" karena QR/Kartu ditolak sistem
+                audioGagal.play().catch(e => console.log("Audio diblokir browser"));
+
                 statusDiv.innerText = "Ditolak: " + data.message;
                 statusDiv.style.color = "#dc2626"; 
                 attendanceStatusText.innerText = "DITOLAK";
@@ -365,6 +390,9 @@
                 profileContainer.style.borderColor = "#fecaca";
             }
         } catch (err) {
+            // SUARA: Bunyi "Buzzer" karena koneksi internet putus saat memproses data
+            audioGagal.play().catch(e => console.log("Audio diblokir browser"));
+
             profileContainer.style.opacity = "1";
             statusDiv.innerText = "Koneksi Terputus / Server Sibuk.";
             statusDiv.style.color = "#dc2626";
