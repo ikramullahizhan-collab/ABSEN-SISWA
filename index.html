@@ -57,37 +57,38 @@
         /* FIX LAYAR PENUH: Tambah Padding Atas agar menjauhi URL bar */
         .full-height {
             height: 100% !important;
-            padding-top: 30px !important; /* Disesuaikan sedikit agar proporsional dengan Jam */
+            padding-top: 50px !important; 
             border-radius: 0px !important;
         }
 
-        /* --- CSS BARU: Desain Wadah Jam Digital --- */
+        /* Teks & Tipografi Utama */
+        h2 { margin: 0 0 4px 0; color: #111827; font-size: 24px; }
+
+        /* --- CSS UPDATE: Penyelarasan Jam & Tanggal Menyamping --- */
         #clockContainer {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* Jarak antara Jam dan Tanggal */
             margin: 0 auto 20px auto;
-            padding: 12px;
-            background-color: #f8fafc;
-            border-radius: 14px;
-            max-width: 340px;
-            border: 1px solid #e2e8f0;
+            color: #64748b;
         }
         #liveClock {
-            font-size: 34px; /* Angka jam tegas */
-            font-weight: 800;
-            color: #0f172a;
-            font-family: 'Courier New', Courier, monospace; /* Monospace agar angka tidak goyang saat berdetik */
-            letter-spacing: 1px;
-            line-height: 1;
+            font-size: 18px; /* Lebih kecil dari h2 (24px) */
+            font-weight: 700;
+            color: #1e293b;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .clock-divider {
+            font-size: 16px;
+            color: #cbd5e1;
         }
         #liveDate {
-            font-size: 13px;
+            font-size: 14px; /* Lebih kecil dari h2 (24px) */
             color: #64748b;
-            font-weight: 600;
-            margin-top: 6px;
+            font-weight: 500;
         }
 
-        /* Teks & Tipografi */
-        h2 { margin: 0 0 8px 0; color: #111827; font-size: 24px; }
         .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 25px; }
         
         /* MENU UTAMA */
@@ -166,12 +167,14 @@
     </div>
 
     <div id="infoSection" class="info-section full-height">
+        <h2>Sistem E-Absensi</h2>
+        
         <div id="clockContainer">
-            <div id="liveClock">00:00:00 WIB</div>
-            <div id="liveDate">Memuat Tanggal...</div>
+            <span id="liveClock">00:00:00</span>
+            <span class="clock-divider">•</span>
+            <span id="liveDate">Memuat Tanggal...</span>
         </div>
 
-        <h2>Sistem E-Absensi</h2>
         <p class="subtitle" id="mainSubtitle">Silakan pilih metode absensi siswa di bawah ini untuk memulai.</p>
         
         <div id="menuSelection" class="menu-selection">
@@ -428,7 +431,7 @@
         }, 3000);
     }
 
-    // --- JAVASCRIPT BARU: Sistem Detak Jam Digital Real-Time ---
+    // --- JAVASCRIPT UPDATE: Hapus teks WIB ---
     function startLiveClock() {
         const clockElement = document.getElementById("liveClock");
         const dateElement = document.getElementById("liveDate");
@@ -436,7 +439,6 @@
         setInterval(() => {
             const now = new Date();
 
-            // Format Waktu Indonesia (24 Jam) -> HH:MM:SS
             const formatTime = now.toLocaleTimeString("id-ID", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -444,7 +446,6 @@
                 hour12: false
             });
 
-            // Format Tanggal Indonesia -> Hari, DD Bulan YYYY
             const formatDate = now.toLocaleDateString("id-ID", {
                 weekday: "long",
                 day: "numeric",
@@ -452,12 +453,12 @@
                 year: "numeric"
             });
 
-            clockElement.innerText = formatTime + " WIB";
+            // "WIB" resmi dihilangkan dari baris ini
+            clockElement.innerText = formatTime;
             dateElement.innerText = formatDate;
         }, 1000);
     }
 
-    // Jalankan mesin jam setelah seluruh dokumen HTML selesai dimuat
     window.addEventListener("DOMContentLoaded", startLiveClock);
 </script>
 
