@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mesin Absensi QR & NFC</title>
+    <title>Absensi QR & NFC</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
     <style>
@@ -179,16 +179,16 @@
         
         <div id="menuSelection" class="menu-selection">
             <button class="btn-option btn-nfc" onclick="activateMode('NFC')">
-                <span>📟</span> KARTU RFID (NFC)
+                <span>📟</span> RFID (NFC)
             </button>
             <button class="btn-option btn-qrc" onclick="activateMode('QR')">
-                <span>🔍</span> SCAN QR CODE
+                <span>🔍</span> QR CODE
             </button>
-            <a href="pengaturan.html" class="link-admin">⚙️ Pengaturan Admin</a>
+            <a href="pengaturan.html" class="link-admin">⚙️ Seting</a>
         </div>
         
         <div id="scanView" class="scan-view">
-            <div id="status">Standby...</div>
+            <div id="status">Siap...</div>
             <div id="log"></div>
             
             <div id="profileContainer">
