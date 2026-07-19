@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rekap Absensi Siswa</title>
+    
+    <style>
+        /* Mengikuti basis style index.html agar serasi */
+        html, body {
+            margin: 0; padding: 0; 
+            min-height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Card Utama */
+        .main-card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+
+        h2 { margin: 0 0 5px 0; font-size: 24px; text-align: center; }
+        .subtitle { color: #6b7280; font-size: 14px; text-align: center; margin-bottom: 25px; }
+
+        /* Form Filter */
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .input-control {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label { font-size: 14px; font-weight: bold; color: #4b5563; }
+        
+        select, input[type="date"] {
+            padding: 12px;
+            font-size: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input[type="date"]:focus {
+            border-color: #3b82f6;
+        }
+
+        .btn-cari {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white; padding: 14px; font-size: 16px; font-weight: bold;
+            border: none; border-radius: 12px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+        .btn-cari:active { transform: scale(0.98); }
+
+        /* Area Tabel / Hasil */
+        .result-section {
+            margin-top: 25px;
+            display: none; /* Muncul setelah cari diklik */
+        }
+
+        .summary-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .summary-item font { font-weight: bold; font-size: 16px; }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+            background-color: white;
+        }
+
+        th { background-color: #f9fafb; padding: 12px; color: #4b5563; font-weight: 600; border-bottom: 2px solid #e5e7eb; }
+        td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
+
+        /* Badge Status */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .badge-masuk { background-color: #dcfce7; color: #15803d; }
+        .badge-terlambat { background-color: #fee2e2; color: #b91c1c; }
+        .badge-pulang { background-color: #dbeafe; color: #1d4ed8; }
+
+        /* Tombol Kembali */
+        .btn-back {
+            display: block; text-align: center; text-decoration: none;
+            background-color: #6b7280; color: white; padding: 12px;
+            border-radius: 10px; font-weight: bold; font-size: 14px;
+            margin-top: 25px; transition: background 0.2s;
+        }
+        .btn-back:hover { background-color: #4b5563; }
+
+        #statusText { text-align: center; font-weight: bold; color: #4b5563; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="main-card">
+            <h2>Rekap Absensi Siswa</h2>
+            <p class="subtitle">Pilih kelas dan tanggal untuk melihat data kehadiran.</p>
+
+            <div class="filter-group">
+                <div class="input-control">
+                    <label for="pilihKelas">Pilih Kelas</label>
+                    <select id="pilihKelas">
+                        <option value="">-- Pilih Kelas --</option>
+                        <option value="X-A">Kelas X-A</option>
+                        <option value="X-B">Kelas X-B</option>
+                        <option value="XI-A">Kelas XI-A</option>
+                        <option value="XI-B">Kelas XI-B</option>
+                        <option value="XII-A">Kelas XII-A</option>
+                        <option value="XII-B">Kelas XII-B</option>
+                    </select>
+                </div>
+
+                <div class="input-control">
+                    <label for="pilihTanggal">Tanggal</label>
+                    <input type="date" id="pilihTanggal">
+                </div>
+
+                <button class="btn-cari" onclick="ambilDataAbsen()">🔍 Tampilkan Data</button>
+            </div>
+
+            <div id="statusText"></div>
+
+            <div id="resultSection" class="result-section">
+                <div class="summary-box">
+                    <div class="summary-item">Hadir<br><font id="totalHadir" style="color: #16a34a;">0</font></div>
+                    <div class="summary-item">Terlambat<br><font id="totalTerlambat" style="color: #dc2626;">0</font></div>
+                    <div class="summary-item">Total<br><font id="totalSiswa" style="color: #1e293b;">0</font></div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Jam</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelBodi">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <a href="index.html" class="btn-back">⬅️ Kembali ke Menu Utama</a>
+        </div>
+    </div>
+
+<script>
+    // Menyelaraskan URL API Apps Script Anda yang sudah ada
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2DsW6Kk7H2bWTLJSs8e2p_1USfv6T_DWT2NfBUy7KKVHSPv1TnqoWcW4Su-Jh7qE6mw/exec";
+
+    // Set tanggal default ke hari ini secara otomatis saat halaman dibuka
+    document.getElementById('pilihTanggal').valueAsDate = new Date();
+
+    async function ambilDataAbsen() {
+        const kelas = document.getElementById("pilihKelas").value;
+        const tanggal = document.getElementById("pilihTanggal").value;
+        const statusText = document.getElementById("statusText");
+        const resultSection = document.getElementById("resultSection");
+        const tabelBodi = document.getElementById("tabelBodi");
+
+        if (!kelas) {
+            alert("Silakan pilih kelas terlebih dahulu!");
+            return;
+        }
+
+        // Tampilkan loading animation/teks
+        statusText.innerText = "Sedang mengambil data dari server...";
+        statusText.style.color = "#2563eb";
+        resultSection.style.display = "none";
+        tabelBodi.innerHTML = "";
+
+        try {
+            // Mengirim request dengan parameter tambahan guna dibaca oleh Google Apps Script
+            // Contoh format url: URL?action=getRekap&kelas=X-A&tanggal=2026-07-20
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=getRekap&kelas=${encodeURIComponent(kelas)}&tanggal=${tanggal}`);
+            const resData = await response.json();
+
+            if (resData.status === "success" && resData.data.length > 0) {
+                statusText.innerText = ""; // Hapus status loading
+                
+                let hadir = 0;
+                let terlambat = 0;
+
+                resData.data.forEach(siswa => {
+                    const row = document.createElement("tr");
+
+                    // Kolom Nama
+                    const cellNama = document.createElement("td");
+                    cellNama.innerText = siswa.nama;
+                    row.appendChild(cellNama);
+
+                    // Kolom Jam Absen
+                    const cellJam = document.createElement("td");
+                    cellJam.innerText = siswa.jam || "--:--";
+                    row.appendChild(cellJam);
+
+                    // Kolom Status Badge
+                    const cellStatus = document.createElement("td");
+                    const badge = document.createElement("span");
+                    badge.className = "badge";
+                    
+                    let statusCek = (siswa.statusAbsen || "").toUpperCase();
+                    if (statusCek.includes("TERLAMBAT")) {
+                        badge.classList.add("badge-terlambat");
+                        badge.innerText = "Terlambat";
+                        terlambat++;
+                    } else if (statusCek.includes("MASUK") || statusCek !== "") {
+                        badge.classList.add("badge-masuk");
+                        badge.innerText = "Hadir";
+                        hadir++;
+                    } else {
+                        badge.classList.add("badge-terlambat");
+                        badge.innerText = "Alfa / Belum Absen";
+                    }
+
+                    cellStatus.appendChild(badge);
+                    row.appendChild(cellStatus);
+                    tabelBodi.appendChild(row);
+                });
+
+                // Update info ringkasan di atas tabel
+                document.getElementById("totalHadir").innerText = hadir;
+                document.getElementById("totalTerlambat").innerText = terlambat;
+                document.getElementById("totalSiswa").innerText = resData.data.length;
+
+                resultSection.style.display = "block"; // Munculkan tabel
+            } else {
+                statusText.innerText = "Tidak ada data absensi untuk kelas dan tanggal tersebut.";
+                statusText.style.color = "#d97706";
+            }
+        } catch (error) {
+            statusText.innerText = "Gagal memuat data. Periksa koneksi internet atau server Google Sheets Anda.";
+            statusText.style.color = "#dc2626";
+            console.error(error);
+        }
+    }
+</script>
+
+</body>
+</html>
