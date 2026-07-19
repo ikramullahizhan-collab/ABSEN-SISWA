@@ -107,30 +107,38 @@
         .btn-qrc { background: linear-gradient(135deg, #10b981, #047857); }
         .btn-option span { font-size: 24px; }
 
-        /* GRUP TOMBOL BAWAH (REKAP & SETING) */
+       /* GRUP TOMBOL BAWAH (REKAP & SETING) - Disamarkan */
         .action-group {
             display: flex; 
-            gap: 15px; 
-            margin-top: 5px; 
+            justify-content: center;
+            gap: 40px; /* Jarak antara tulisan rekap dan seting */
+            margin-top: 35px; /* Didorong agak ke bawah agar menjauh dari tombol utama */
         }
+        
         .btn-half {
-            flex: 1; /* Membagi ukuran sama rata kiri dan kanan */
-            padding: 15px 10px; 
-            font-size: 15px; 
-            font-weight: bold; 
-            color: white;
+            font-size: 13px; /* Ukuran teks kecil */
+            font-weight: 600; 
+            color: #d1d5db; /* Warna abu-abu yang sangat samar/pudar */
             text-decoration: none; 
-            border-radius: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-            transition: transform 0.2s;
+            background: transparent; /* Latar belakang transparan */
+            border: none; /* Hilangkan garis pinggir */
+            box-shadow: none; /* Hilangkan bayangan */
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            gap: 8px;
+            gap: 6px;
+            transition: color 0.2s;
+            cursor: pointer;
         }
-        .btn-half:active { transform: scale(0.98); }
-        .btn-rekap { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .btn-seting { background: linear-gradient(135deg, #64748b, #475569); }
+
+        .btn-half:active { 
+            color: #9ca3af; /* Sedikit lebih gelap saat disentuh agar ada efek klik */
+            transform: scale(0.98); 
+        }
+
+        /* Hapus warna gradien sebelumnya */
+        .btn-rekap { background: none; }
+        .btn-seting { background: none; }
         
         /* (HAPUS class .link-admin karena sudah tidak dipakai dan digantikan .btn-seting di atas) */
         /* AREA PROSES ABSENSI */
